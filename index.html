@@ -599,31 +599,32 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      opacity: 0.9;
+      opacity: 1;
       transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
     }
 
     .video-card:hover .video-thumb-img {
-      transform: scale(1.12);
+      transform: scale(1.05);
       opacity: 0;
     }
 
     .video-iframe-preview {
       position: absolute;
-      inset: -10%;
-      width: 120%;
-      height: 120%;
+      top: 50%;
+      left: 50%;
+      width: 140%;
+      height: 140%;
       border: none;
       pointer-events: none;
       opacity: 0;
-      transform: scale(1.08);
+      transform: translate(-50%, -50%) scale(1);
       transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
       z-index: 2;
     }
 
     .video-card.is-previewing .video-iframe-preview {
       opacity: 1;
-      transform: scale(1.15);
+      transform: translate(-50%, -50%) scale(1.05);
     }
 
     .video-play-btn {
@@ -649,7 +650,6 @@
       transform: scale(1.12);
       background: var(--text-cream);
       color: var(--bg-dark);
-      opacity: 0.25;
     }
 
     .video-card.is-previewing .video-play-btn {
@@ -1917,18 +1917,19 @@
 
         card.addEventListener('mouseenter', () => {
           hoverTimer = setTimeout(() => {
+            const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&loop=1&playlist=${videoId}&enablejsapi=1&playsinline=1`;
             if (!iframe) {
               iframe = document.createElement('iframe');
               iframe.className = 'video-iframe-preview';
-              iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&loop=1&playlist=${videoId}&enablejsapi=1&playsinline=1`;
+              iframe.src = embedUrl;
               iframe.setAttribute('allow', 'autoplay; encrypted-media');
               iframe.setAttribute('tabindex', '-1');
               container.appendChild(iframe);
             } else {
-              iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&loop=1&playlist=${videoId}&enablejsapi=1&playsinline=1`;
+              iframe.src = embedUrl;
             }
             card.classList.add('is-previewing');
-          }, 100);
+          }, 80);
         });
 
         card.addEventListener('mouseleave', () => {
