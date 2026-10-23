@@ -26,7 +26,7 @@ export default function Backdrop({ src }: { src: string }) {
   );
 
   return (
-    <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden bg-zinc-950">
+    <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-zinc-950">
       {layers.map((l, i) => (
         // eslint-disable-next-line @next/next/no-img-element
         <img

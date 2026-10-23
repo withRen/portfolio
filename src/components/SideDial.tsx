@@ -2,14 +2,14 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-export type DialId = 'intro' | 'all' | 'dev' | 'video' | 'photo';
+export type DialId = 'top' | 'photos' | 'videos' | 'dev' | 'contact';
 
 const items: { id: DialId; label: string }[] = [
-  { id: 'intro', label: 'Intro' },
-  { id: 'all', label: 'Tout' },
+  { id: 'top', label: 'Intro' },
+  { id: 'photos', label: 'Photo' },
+  { id: 'videos', label: 'Vidéo' },
   { id: 'dev', label: 'Dev' },
-  { id: 'video', label: 'Vidéo' },
-  { id: 'photo', label: 'Photo' },
+  { id: 'contact', label: 'Contact' },
 ];
 
 const W = 120;
@@ -36,7 +36,7 @@ export default function SideDial({ active, onSelect }: Props) {
     }
     setFlash(true);
     if (flashTimer.current) clearTimeout(flashTimer.current);
-    flashTimer.current = setTimeout(() => setFlash(false), 1800);
+    flashTimer.current = setTimeout(() => setFlash(false), 1300);
   }, [active]);
 
   useEffect(

@@ -1,0 +1,57 @@
+import { ArrowUpRight } from '@phosphor-icons/react/dist/ssr';
+import { contactHref, socials, tools } from '@/data/content';
+import Reveal from './Reveal';
+
+export default function ContactSection() {
+  return (
+    <section id="contact" aria-labelledby="contact-title" className="pb-10 pt-24 md:pt-40">
+      <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-14 px-5 md:grid-cols-12 md:gap-6 md:px-10">
+        <Reveal className="md:col-span-7">
+          <h2 id="contact-title" className="text-5xl font-semibold leading-[0.95] tracking-tighter text-zinc-50 md:text-7xl">
+            Un projet, une idée ?
+          </h2>
+          <a
+            href={contactHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group mt-10 inline-flex items-center gap-3 rounded-full bg-zinc-50 py-3 pl-6 pr-3 font-medium text-zinc-950 transition-transform duration-300 hover:-translate-y-0.5 active:scale-[0.98]"
+          >
+            Me contacter
+            <span className="inline-flex size-9 items-center justify-center rounded-full bg-zinc-950 text-zinc-50 transition-transform duration-500 ease-out-expo group-hover:rotate-45">
+              <ArrowUpRight size={16} weight="regular" aria-hidden />
+            </span>
+          </a>
+        </Reveal>
+
+        <Reveal index={1} className="flex flex-col gap-8 md:col-span-4 md:col-start-9 md:pt-3">
+          <p className="max-w-[40ch] leading-relaxed text-zinc-300">
+            Étudiant en BUT MMI. Je développe des applications web, mobiles et desktop, et je réalise des vidéos et des
+            photos.
+          </p>
+          <div>
+            <h3 className="text-sm font-medium text-zinc-500">Outils</h3>
+            <p className="mt-2 leading-relaxed text-zinc-300">{tools.join(', ')}</p>
+          </div>
+        </Reveal>
+      </div>
+
+      <footer className="mx-auto mt-24 flex max-w-[1400px] flex-wrap items-center justify-between gap-x-8 gap-y-4 border-t border-white/10 px-5 pt-6 md:mt-36 md:px-10">
+        <span className="text-sm text-zinc-500">&copy; 2026 Rahim Tamhaev</span>
+        <ul className="flex gap-6 text-sm text-zinc-400">
+          {socials.map((s) => (
+            <li key={s.label}>
+              <a
+                href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors duration-300 hover:text-accent"
+              >
+                {s.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </footer>
+    </section>
+  );
+}

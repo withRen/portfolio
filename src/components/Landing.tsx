@@ -4,21 +4,20 @@ import { useEffect, useRef } from 'react';
 import { asset } from '@/data/content';
 import WaveCanvas from './WaveCanvas';
 
-type Props = { onPanel: (p: 'about' | 'contact') => void };
+type Props = { onNav: (id: string) => void };
 
 const clamp = (n: number, min = 0, max = 1) => Math.min(max, Math.max(min, n));
 const smooth = (t: number) => t * t * (3 - 2 * t);
 
 const underline = 'border-b border-current pb-0.5 transition-opacity duration-300 hover:opacity-60';
 
-export default function Landing({ onPanel }: Props) {
+export default function Landing({ onNav }: Props) {
   const section = useRef<HTMLElement>(null);
   const frame = useRef<HTMLDivElement>(null);
   const img = useRef<HTMLDivElement>(null);
   const title = useRef<HTMLDivElement>(null);
   const backdrop = useRef<HTMLDivElement>(null);
   const shadow = useRef<HTMLDivElement>(null);
-  const hint = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -35,7 +34,7 @@ export default function Landing({ onPanel }: Props) {
       const end = wide.matches ? { x: 19, t: 31, b: 13 } : { x: 6, t: 30, b: 20 };
 
       if (frame.current) {
-        frame.current.style.clipPath = `inset(${(end.t * p).toFixed(2)}% ${(end.x * p).toFixed(2)}% ${(end.b * p).toFixed(2)}% ${(end.x * p).toFixed(2)}% round ${(20 * p).toFixed(1)}px)`;
+        frame.current.style.clipPath = `inset(${(end.t * p).toFixed(2)}% ${(end.x * p).toFixed(2)}% ${(end.b * p).toFixed(2)}% ${(end.x * p).toFixed(2)}% round ${(28 * p).toFixed(1)}px)`;
         frame.current.style.pointerEvents = p > 0.9 ? 'auto' : 'none';
       }
       if (backdrop.current) backdrop.current.style.opacity = p.toFixed(3);
@@ -44,7 +43,7 @@ export default function Landing({ onPanel }: Props) {
         st.top = `${(end.t * p).toFixed(2)}%`;
         st.bottom = `${(end.b * p).toFixed(2)}%`;
         st.left = st.right = `${(end.x * p).toFixed(2)}%`;
-        st.borderRadius = `${(20 * p).toFixed(1)}px`;
+        st.borderRadius = `${(28 * p).toFixed(1)}px`;
         st.opacity = clamp(p * 1.5).toFixed(3);
       }
       if (img.current) img.current.style.transform = `scale(${(1.15 - 0.15 * p).toFixed(4)})`;
@@ -53,7 +52,6 @@ export default function Landing({ onPanel }: Props) {
         title.current.style.opacity = o.toFixed(3);
         title.current.style.transform = `translateY(${((1 - o) * 18).toFixed(1)}px)`;
       }
-      if (hint.current) hint.current.style.opacity = (1 - clamp(p / 0.25)).toFixed(3);
     };
 
     const onScroll = () => {
@@ -70,7 +68,7 @@ export default function Landing({ onPanel }: Props) {
     };
   }, []);
 
-  const toCatalogue = () => document.getElementById('catalogue')?.scrollIntoView({ behavior: 'smooth' });
+  const toWork = () => onNav('photos');
 
   return (
     <section ref={section} id="top" aria-label="Introduction" className="relative h-[200dvh] text-zinc-50">
@@ -100,14 +98,16 @@ export default function Landing({ onPanel }: Props) {
             Rahim
             <br className="md:hidden" /> Tamhaev
           </h1>
-          <p className="label mt-3 text-zinc-300 md:mt-4">Développement · Vidéo · Photographie</p>
+          <p className="mx-auto mt-4 max-w-[36ch] text-sm leading-relaxed text-zinc-300 md:mt-5 md:text-base">
+            Développeur et vidéaste. Je code des interfaces et je filme des histoires.
+          </p>
         </div>
 
         <div ref={frame} className="absolute inset-0 will-change-[clip-path]" style={{ clipPath: 'inset(0% 0% 0% 0% round 0px)' }}>
           <button
             type="button"
-            onClick={toCatalogue}
-            aria-label="Voir le catalogue"
+            onClick={toWork}
+            aria-label="Voir les projets"
             className="block size-full cursor-pointer overflow-hidden"
           >
             <div
@@ -139,27 +139,18 @@ export default function Landing({ onPanel }: Props) {
 
           <button
             type="button"
-            onClick={toCatalogue}
+            onClick={toWork}
             className={`label pointer-events-auto absolute right-5 top-5 md:right-10 md:top-8 ${underline}`}
           >
-            Voir le catalogue
+            Voir les projets
           </button>
 
           <div className="pointer-events-auto absolute bottom-6 left-5 flex flex-col items-start gap-3 md:bottom-8 md:left-10">
-            <button type="button" onClick={() => onPanel('about')} className={`label ${underline}`}>
-              À propos
-            </button>
-            <button type="button" onClick={() => onPanel('contact')} className={`label ${underline}`}>
+            <button type="button" onClick={() => onNav('contact')} className={`label ${underline}`}>
               Me contacter
             </button>
           </div>
 
-          <div ref={hint} aria-hidden className="absolute bottom-6 right-5 md:bottom-8 md:right-10">
-            <svg width="22" height="34" viewBox="0 0 22 34" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <rect x="1" y="1" width="20" height="32" rx="10" />
-              <line x1="11" y1="8" x2="11" y2="13" className="wheel" />
-            </svg>
-          </div>
         </div>
       </div>
     </section>

@@ -8,12 +8,12 @@ const mono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono', dis
 const display = Barlow_Condensed({ subsets: ['latin'], weight: ['700'], variable: '--font-barlow', display: 'swap' });
 
 export const metadata: Metadata = {
-  title: 'Rahim Tamhaev — Développeur et créatif',
+  title: 'Rahim Tamhaev, développeur et vidéaste',
   description:
     'Portfolio de Rahim Tamhaev, étudiant BUT MMI : développement web, mobile et desktop, création audiovisuelle et photographie.',
   openGraph: {
     type: 'website',
-    title: 'Rahim Tamhaev — Développeur et créatif',
+    title: 'Rahim Tamhaev, développeur et vidéaste',
     description: 'Développement web, mobile et desktop, création audiovisuelle et photographie.',
   },
   icons: {
@@ -26,7 +26,7 @@ export const viewport: Viewport = { themeColor: '#09090b' };
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr" className={`${sans.variable} ${mono.variable} ${display.variable}`}>
-      <body className="bg-zinc-950 font-sans text-zinc-100 antialiased">{children}</body>
+      <body className="font-sans text-zinc-100 antialiased">{children}</body>
     </html>
   );
 }
