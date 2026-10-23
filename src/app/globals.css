@@ -100,6 +100,41 @@ body {
   }
 }
 
+/* Photo wall: pinned stage, columns sliding in opposite directions (see PhotoSection) */
+.pg-section { padding-block: 6rem; }
+@keyframes pg-up {
+  from { transform: translateY(0); }
+  to { transform: translateY(calc(-100% + 100dvh)); }
+}
+@keyframes pg-down {
+  from { transform: translateY(calc(-100% + 100dvh)); }
+  to { transform: translateY(0); }
+}
+@keyframes pg-title {
+  from { transform: scale(1.18); letter-spacing: 0.04em; }
+  to { transform: scale(0.92); letter-spacing: -0.02em; }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .pg-section { height: 340dvh; padding-block: 0; view-timeline-name: --pg; view-timeline-axis: block; }
+    .pg-stage { position: sticky; top: 0; height: 100dvh; overflow: hidden; }
+    .pg-grid { align-items: start; }
+    .pg-col-up, .pg-col-down, .pg-title {
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: --pg;
+      animation-range: contain 0% contain 100%;
+    }
+    .pg-col-up { animation-name: pg-up; }
+    .pg-col-down { animation-name: pg-down; }
+    .pg-title { animation-name: pg-title; }
+  }
+}
+/* Hovering a photo pushes the others back */
+@media (hover: hover) {
+  .pg-grid:has(.pg-tile:hover) .pg-tile:not(:hover) { opacity: 0.35; }
+}
+
 /* Glass surfaces fall back to solid fills when transparency is unwanted */
 @media (prefers-reduced-transparency: reduce) {
   .glass {
