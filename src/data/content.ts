@@ -1,3 +1,5 @@
+export const asset = (path: string) => `${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}${path}`;
+
 export type Row = {
   title: string;
   desc?: string;
@@ -39,7 +41,7 @@ export const projects: Row[] = [
     desc: "Conception et développement d'un thème sur mesure pour des retraites de bien-être. Interface personnalisée et back-office optimisé. Site client en ligne.",
     tags: ['WordPress', 'PHP', 'UI / UX'],
     href: 'https://www.imma-nence.com/',
-    preview: '/photos/immanence_thumbnail.png',
+    preview: asset('/photos/immanence_thumbnail.png'),
   },
   {
     title: 'Zwyx',

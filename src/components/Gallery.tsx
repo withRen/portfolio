@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import type { Photo } from '@/data/content';
+import { asset, type Photo } from '@/data/content';
 import Reveal from './Reveal';
 
 type Props = { columns: Photo[][] };
 
-const src = (p: Photo) => `/photos/${p.file}.webp`;
+const src = (p: Photo) => asset(`/photos/${p.file}.webp`);
 const pad = (n: number) => String(n).padStart(2, '0');
 
 function Shot({ photo, index, onOpen }: { photo: Photo; index: number; onOpen: () => void }) {
