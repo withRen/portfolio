@@ -68,8 +68,15 @@ body {
 .wheel { animation: wheel 1.8s var(--ease-out-expo) infinite; }
 
 dialog::backdrop {
-  background: oklch(0.14 0.005 285 / 0.96);
+  background: oklch(0.13 0.004 230 / 0.62);
+  backdrop-filter: blur(24px);
 }
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.backdrop-in { animation: fade-in 0.9s var(--ease-out-expo) both; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

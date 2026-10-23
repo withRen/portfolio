@@ -1,7 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { kindLabel, works, type Kind, type Work } from '@/data/content';
+import { asset, kindLabel, works, type Kind, type Work } from '@/data/content';
+import Backdrop from './Backdrop';
 import GridView from './GridView';
 import Lightbox from './Lightbox';
 import ListView from './ListView';
@@ -43,13 +44,14 @@ function ViewSwitch({ view, onChange, className }: { view: View; onChange: (v: V
 }
 
 type Props = {
+  revealed: boolean;
   filter: Filter;
   onFilter: (f: Filter) => void;
   onPanel: (p: 'about' | 'contact') => void;
 };
 
-export default function Portfolio({ filter, onFilter, onPanel }: Props) {
-  const [view, setView] = useState<View>('list');
+export default function Portfolio({ revealed, filter, onFilter, onPanel }: Props) {
+  const [view, setView] = useState<View>('slider');
   const [lightbox, setLightbox] = useState<number | null>(null);
   const [active, setActive] = useState(0);
   const go = useRef<(delta: number) => void>(() => {});
@@ -85,10 +87,18 @@ export default function Portfolio({ filter, onFilter, onPanel }: Props) {
 
   const current = items[Math.min(active, items.length - 1)];
   const isSlider = view === 'slider';
+  const dunes = asset('/photos/dunes.png');
+  const target = isSlider && current?.image ? current.image : dunes;
+  const [backdrop, setBackdrop] = useState(dunes);
+  useEffect(() => {
+    const t = setTimeout(() => setBackdrop(target), 140);
+    return () => clearTimeout(t);
+  }, [target]);
 
   return (
-    <div id="catalogue" className="grid h-[100dvh] grid-cols-[minmax(0,1fr)] grid-rows-[auto_minmax(0,1fr)_auto]">
-      <header className="border-b border-zinc-800">
+    <div id="catalogue" className="relative isolate grid h-[100dvh] grid-cols-[minmax(0,1fr)] grid-rows-[auto_minmax(0,1fr)_auto]">
+      <Backdrop src={backdrop} />
+      <header className={`border-b border-white/10 transition-[opacity,transform] duration-700 ease-out-expo ${revealed ? 'opacity-100' : 'translate-y-3 opacity-0'}`}>
         <div className="mx-auto grid max-w-[1440px] grid-cols-[1fr_auto] items-center gap-x-6 gap-y-3 px-5 py-4 md:grid-cols-[1fr_auto_1fr] md:px-10">
           <div className="flex items-center gap-5">
             <h2 className="sr-only">Catalogue des réalisations</h2>
@@ -134,6 +144,8 @@ export default function Portfolio({ filter, onFilter, onPanel }: Props) {
       </header>
 
       <main className="min-h-0 pt-5" id="contenu">
+        {revealed && (
+          <>
         {view === 'list' && <ListView key={`list-${filter}`} items={items} onPhoto={openPhoto} />}
         {view === 'grid' && <GridView key={`grid-${filter}`} items={items} onPhoto={openPhoto} />}
         {isSlider && (
@@ -146,9 +158,11 @@ export default function Portfolio({ filter, onFilter, onPanel }: Props) {
             registerGo={registerGo}
           />
         )}
+          </>
+        )}
       </main>
 
-      <footer className="relative border-t border-zinc-800">
+      <footer className={`relative border-t border-white/10 transition-[opacity,transform] delay-200 duration-700 ease-out-expo ${revealed ? 'opacity-100' : 'translate-y-3 opacity-0'}`}>
         {isSlider && (
           <span
             aria-hidden
@@ -184,7 +198,7 @@ export default function Portfolio({ filter, onFilter, onPanel }: Props) {
                   type="button"
                   aria-label="Précédent"
                   onClick={() => go.current(-1)}
-                  className="label rounded-sm border border-zinc-700 px-3 py-2 text-zinc-300 transition-colors duration-300 hover:bg-zinc-100 hover:text-zinc-950 active:scale-[0.98]"
+                  className="label rounded-full border border-white/20 px-4 py-2 text-zinc-300 transition-colors duration-300 hover:bg-zinc-100 hover:text-zinc-950 active:scale-[0.98]"
                 >
                   Préc.
                 </button>
@@ -192,7 +206,7 @@ export default function Portfolio({ filter, onFilter, onPanel }: Props) {
                   type="button"
                   aria-label="Suivant"
                   onClick={() => go.current(1)}
-                  className="label rounded-sm border border-zinc-700 px-3 py-2 text-zinc-300 transition-colors duration-300 hover:bg-zinc-100 hover:text-zinc-950 active:scale-[0.98]"
+                  className="label rounded-full border border-white/20 px-4 py-2 text-zinc-300 transition-colors duration-300 hover:bg-zinc-100 hover:text-zinc-950 active:scale-[0.98]"
                 >
                   Suiv.
                 </button>

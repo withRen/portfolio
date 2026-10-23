@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, type CSSProperties } from 'react';
 import type { Work } from '@/data/content';
 import Tile from './Tile';
 
@@ -21,6 +21,7 @@ export default function SliderView({ items, active, onActive, onPhoto, registerG
     el?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
   }, []);
 
+  // Continuous distance-to-center (0 at center, 1 one card away) drives scale and opacity
   const measure = useCallback(() => {
     const t = track.current;
     if (!t) return;
@@ -28,9 +29,10 @@ export default function SliderView({ items, active, onActive, onPhoto, registerG
     let best = 0;
     let bestDist = Infinity;
     t.querySelectorAll<HTMLElement>('[data-i]').forEach((el) => {
-      const d = Math.abs(el.offsetLeft + el.offsetWidth / 2 - mid);
-      if (d < bestDist) {
-        bestDist = d;
+      const dist = Math.abs(el.offsetLeft + el.offsetWidth / 2 - mid);
+      el.style.setProperty('--d', Math.min(1, dist / (el.offsetWidth * 0.9 + 24)).toFixed(3));
+      if (dist < bestDist) {
+        bestDist = dist;
         best = Number(el.dataset.i);
       }
     });
@@ -49,9 +51,13 @@ export default function SliderView({ items, active, onActive, onPhoto, registerG
     const t = track.current;
     const first = t?.querySelector<HTMLElement>('[data-i="0"]');
     if (t && first) t.scrollLeft = first.offsetLeft + first.offsetWidth / 2 - t.clientWidth / 2;
+    measure();
+    window.addEventListener('resize', onScroll);
     return () => {
+      window.removeEventListener('resize', onScroll);
       if (raf.current) cancelAnimationFrame(raf.current);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -75,15 +81,29 @@ export default function SliderView({ items, active, onActive, onPhoto, registerG
       tabIndex={0}
       role="region"
       aria-label="Réalisations, défilement horizontal"
-      className="flex h-full snap-x snap-mandatory items-center gap-3 overflow-x-auto overflow-y-hidden px-0 py-2 [scrollbar-width:none] focus-visible:outline-offset-[-3px] md:gap-5 [&::-webkit-scrollbar]:hidden"
+      className="flex h-full snap-x snap-mandatory items-center gap-4 overflow-x-auto overflow-y-hidden py-4 [scrollbar-width:none] focus-visible:outline-offset-[-3px] md:gap-6 [&::-webkit-scrollbar]:hidden"
     >
       <div aria-hidden className="w-[50vw] shrink-0" />
       {items.map((w, i) => {
         const isActive = i === active;
-        const cls = `relative block shrink-0 snap-center overflow-hidden rounded-sm text-left transition-[filter,opacity] duration-500 ease-out-expo ${
-          isActive ? 'opacity-100 grayscale-0' : 'opacity-50 grayscale'
-        }`;
-        const style = { aspectRatio: String(w.ratio), height: `min(100%, 30rem, ${(86 / w.ratio).toFixed(2)}vw)` };
+        const outer: CSSProperties = {
+          aspectRatio: String(w.ratio),
+          height: `min(100%, 36rem, ${(84 / w.ratio).toFixed(2)}vw)`,
+          '--i': Math.min(i, 8),
+        } as CSSProperties;
+        const inner: CSSProperties = {
+          transform: 'scale(calc(1 - var(--d, 1) * 0.13))',
+          opacity: 'calc(1 - var(--d, 1) * 0.55)',
+        };
+        const card = (
+          <span
+            className="block size-full overflow-hidden rounded-[1.75rem] shadow-[0_30px_60px_-24px_rgb(0_0_0/0.7)] ring-1 ring-white/10 md:rounded-[2.25rem]"
+            style={inner}
+          >
+            <Tile work={w} />
+          </span>
+        );
+        const cls = 'row-in relative block shrink-0 snap-center text-left';
         const handle = (e: React.MouseEvent) => {
           if (!isActive) {
             e.preventDefault();
@@ -101,10 +121,10 @@ export default function SliderView({ items, active, onActive, onPhoto, registerG
             rel="noopener noreferrer"
             onClick={handle}
             className={cls}
-            style={style}
+            style={outer}
             draggable={false}
           >
-            <Tile work={w} />
+            {card}
           </a>
         ) : w.kind === 'photo' ? (
           <button
@@ -113,14 +133,14 @@ export default function SliderView({ items, active, onActive, onPhoto, registerG
             type="button"
             onClick={handle}
             className={`${cls} ${isActive ? 'cursor-zoom-in' : ''}`}
-            style={style}
+            style={outer}
             aria-label={`${w.title}${isActive ? ', agrandir' : ''}`}
           >
-            <Tile work={w} />
+            {card}
           </button>
         ) : (
-          <div key={w.id} data-i={i} className={cls} style={style} onClick={handle}>
-            <Tile work={w} />
+          <div key={w.id} data-i={i} className={cls} style={outer} onClick={handle}>
+            {card}
           </div>
         );
       })}

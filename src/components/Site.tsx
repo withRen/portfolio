@@ -8,8 +8,9 @@ import SideDial, { type DialId } from './SideDial';
 
 export default function Site() {
   const [panel, setPanel] = useState<PanelId>(null);
-  const [filter, setFilter] = useState<Filter>('all');
+  const [filter, setFilter] = useState<Filter>('photo');
   const [section, setSection] = useState<'intro' | 'catalogue'>('intro');
+  const [revealed, setRevealed] = useState(false);
 
   useEffect(() => {
     const targets = ['top', 'catalogue']
@@ -24,7 +25,23 @@ export default function Site() {
       { rootMargin: '-50% 0px -50% 0px' },
     );
     targets.forEach((t) => io.observe(t));
-    return () => io.disconnect();
+
+    const cat = document.getElementById('catalogue');
+    const reveal = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          setRevealed(true);
+          reveal.disconnect();
+        }
+      },
+      { rootMargin: '0px 0px -25% 0px' },
+    );
+    if (cat) reveal.observe(cat);
+
+    return () => {
+      io.disconnect();
+      reveal.disconnect();
+    };
   }, []);
 
   const select = (id: DialId) => {
@@ -39,7 +56,7 @@ export default function Site() {
   return (
     <>
       <Landing onPanel={setPanel} />
-      <Portfolio filter={filter} onFilter={setFilter} onPanel={setPanel} />
+      <Portfolio revealed={revealed} filter={filter} onFilter={setFilter} onPanel={setPanel} />
       <SideDial active={section === 'intro' ? 'intro' : filter} onSelect={select} />
       <InfoPanel panel={panel} onClose={() => setPanel(null)} />
     </>

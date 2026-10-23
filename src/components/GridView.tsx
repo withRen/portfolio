@@ -13,7 +13,7 @@ export default function GridView({ items, onPhoto }: Props) {
         {items.map((w, i) => {
           const inner = (
             <>
-              <span className="block aspect-[4/3] overflow-hidden rounded-sm bg-zinc-900">
+              <span className="block aspect-[4/3] overflow-hidden rounded-2xl bg-zinc-900">
                 <span className="block size-full grayscale transition-[filter,transform] duration-500 ease-out-expo group-hover:scale-[1.03] group-hover:grayscale-0 group-focus-visible:grayscale-0">
                   <Tile work={w} />
                 </span>

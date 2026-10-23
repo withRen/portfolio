@@ -34,7 +34,7 @@ export default function Lightbox({ photos, index, onIndex, onClose }: Props) {
   };
 
   const btn =
-    'rounded-sm border border-zinc-700 px-4 py-2.5 transition-colors duration-300 hover:bg-zinc-100 hover:text-zinc-950 active:scale-[0.98]';
+    'rounded-full border border-white/20 px-5 py-2.5 transition-colors duration-300 hover:bg-zinc-100 hover:text-zinc-950 active:scale-[0.98]';
 
   return (
     <dialog
@@ -66,7 +66,7 @@ export default function Lightbox({ photos, index, onIndex, onClose }: Props) {
           <img
             src={photo.image}
             alt={`Photographie, ${photo.title.toLowerCase()}`}
-            className="max-h-full max-w-full rounded-sm object-contain"
+            className="max-h-full max-w-full rounded-2xl object-contain"
           />
         )}
       </div>

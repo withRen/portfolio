@@ -22,7 +22,7 @@ export default function Panel({ open, title, onClose, children }: Props) {
       onClick={(e) => {
         if (e.target === dialog.current) dialog.current?.close();
       }}
-      className="m-0 ml-auto h-[100dvh] max-h-none w-full max-w-xl overflow-y-auto border-l border-zinc-800 bg-zinc-950 p-0 text-zinc-100"
+      className="m-0 ml-auto h-[100dvh] max-h-none w-full max-w-xl overflow-y-auto border-l border-white/10 bg-zinc-950/70 p-0 backdrop-blur-2xl text-zinc-100"
     >
       <div className="flex min-h-full flex-col px-6 py-5 md:px-10 md:py-6">
         <div className="label flex items-center justify-between text-zinc-500">
@@ -30,7 +30,7 @@ export default function Panel({ open, title, onClose, children }: Props) {
           <button
             type="button"
             onClick={() => dialog.current?.close()}
-            className="rounded-sm border border-zinc-700 px-4 py-2.5 text-zinc-300 transition-colors duration-300 hover:bg-zinc-100 hover:text-zinc-950 active:scale-[0.98]"
+            className="rounded-full border border-white/20 px-5 py-2.5 text-zinc-300 transition-colors duration-300 hover:bg-zinc-100 hover:text-zinc-950 active:scale-[0.98]"
           >
             Fermer
           </button>
