@@ -24,7 +24,7 @@ export default function VideoSection() {
         />
         <div className="mt-12 grid grid-cols-1 gap-x-6 gap-y-10 md:mt-16 md:grid-cols-3 md:grid-rows-[repeat(3,minmax(15rem,auto))]">
           {videos.map((v, i) => (
-            <Reveal key={v.id} index={i} className={cells[i]}>
+            <Reveal key={v.id} index={i} className={`${i === 0 ? 'sd-zoom' : i % 2 ? 'sd-rise' : 'sd-rise-late'} ${cells[i]}`}>
               <VideoCard video={v} featured={i === 0} />
             </Reveal>
           ))}

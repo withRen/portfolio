@@ -60,6 +60,46 @@ body {
   }
 }
 
+/*
+ * Scroll-linked motion (CSS scroll-driven animations, compositor only).
+ * Where supported it replaces the IntersectionObserver reveal; elsewhere the reveal above stays.
+ * sd-rise: headings and cards rise into place as they enter (hierarchy).
+ * sd-slide: the photo carousel arrives sideways, announcing its horizontal axis.
+ * sd-zoom: the featured film grows into place (focus).
+ * sd-parallax: media drift inside their frames while crossing the viewport (depth).
+ */
+@keyframes sd-rise {
+  from { opacity: 0; transform: translateY(72px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes sd-slide {
+  from { opacity: 0; transform: translateX(22vw); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes sd-zoom {
+  from { opacity: 0; transform: translateY(48px) scale(0.88); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes sd-parallax {
+  from { transform: translateY(-7%) scale(1.16); }
+  to { transform: translateY(7%) scale(1.16); }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    [data-reveal] { opacity: 1; transform: none; transition: none; }
+    .sd-rise, .sd-rise-late, .sd-slide, .sd-zoom, .sd-parallax {
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: view();
+    }
+    .sd-rise { animation-name: sd-rise; animation-range: entry 0% cover 30%; }
+    .sd-rise-late { animation-name: sd-rise; animation-range: entry 15% cover 38%; }
+    .sd-slide { animation-name: sd-slide; animation-range: entry 0% cover 40%; }
+    .sd-zoom { animation-name: sd-zoom; animation-range: entry 0% cover 42%; }
+    .sd-parallax { animation-name: sd-parallax; animation-range: cover 0% cover 100%; }
+  }
+}
+
 /* Glass surfaces fall back to solid fills when transparency is unwanted */
 @media (prefers-reduced-transparency: reduce) {
   .glass {

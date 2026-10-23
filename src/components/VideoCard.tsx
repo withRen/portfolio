@@ -40,7 +40,8 @@ export default function VideoCard({ video, featured }: Props) {
       className="group flex h-full flex-col active:scale-[0.99]"
     >
       <span className="relative block min-h-0 flex-1 overflow-hidden rounded-[1.75rem] bg-zinc-900 shadow-[0_30px_60px_-28px_rgb(0_0_0/0.7)] ring-1 ring-white/10">
-        <span className="block aspect-video size-full md:aspect-auto">
+        <span className="block aspect-video size-full md:aspect-auto" />
+        <span className="sd-parallax absolute inset-0 block">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={src}

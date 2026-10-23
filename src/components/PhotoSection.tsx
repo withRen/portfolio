@@ -77,7 +77,7 @@ export default function PhotoSection({ onActiveImage }: Props) {
         className="mx-auto max-w-[1400px] px-5 md:px-10"
       />
 
-      <Reveal className="mt-12 md:mt-16">
+      <Reveal className="sd-slide mt-12 md:mt-16">
         <div
           ref={track}
           onScroll={onScroll}

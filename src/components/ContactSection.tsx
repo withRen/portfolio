@@ -6,7 +6,7 @@ export default function ContactSection() {
   return (
     <section id="contact" aria-labelledby="contact-title" className="pb-10 pt-24 md:pt-40">
       <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-14 px-5 md:grid-cols-12 md:gap-6 md:px-10">
-        <Reveal className="md:col-span-7">
+        <Reveal className="sd-rise md:col-span-7">
           <h2 id="contact-title" className="text-5xl font-semibold leading-[0.95] tracking-tighter text-zinc-50 md:text-7xl">
             Un projet, une idée ?
           </h2>
@@ -23,7 +23,7 @@ export default function ContactSection() {
           </a>
         </Reveal>
 
-        <Reveal index={1} className="flex flex-col gap-8 md:col-span-4 md:col-start-9 md:pt-3">
+        <Reveal index={1} className="sd-rise-late flex flex-col gap-8 md:col-span-4 md:col-start-9 md:pt-3">
           <p className="max-w-[40ch] leading-relaxed text-zinc-300">
             Étudiant en BUT MMI. Je développe des applications web, mobiles et desktop, et je réalise des vidéos et des
             photos.

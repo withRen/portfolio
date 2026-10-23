@@ -13,7 +13,8 @@ function Card({ p }: { p: Project }) {
   const body = (
     <>
       {p.image && (
-        <span className="block aspect-[16/9] overflow-hidden border-b border-white/10">
+        <span className="relative block aspect-[16/9] overflow-hidden border-b border-white/10">
+          <span className="sd-parallax absolute inset-0 block">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={p.image}
@@ -21,6 +22,7 @@ function Card({ p }: { p: Project }) {
             loading="lazy"
             className="size-full object-cover transition-transform duration-700 ease-out-expo group-hover:scale-[1.03]"
           />
+          </span>
         </span>
       )}
       <span className="flex flex-1 flex-col justify-between gap-10 p-7 md:p-9">
@@ -79,7 +81,7 @@ export default function ProjectSection() {
         />
         <div className="mt-12 grid grid-cols-1 gap-5 md:mt-16 md:grid-cols-12 md:gap-6">
           {projects.map((p, i) => (
-            <Reveal key={p.id} index={i % 2} className={spans[i]}>
+            <Reveal key={p.id} index={i % 2} className={`${i % 2 ? 'sd-rise-late' : 'sd-rise'} ${spans[i]}`}>
               <Card p={p} />
             </Reveal>
           ))}
