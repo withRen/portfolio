@@ -23,10 +23,7 @@ export const viewport: Viewport = { themeColor: '#09090b' };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" className={`${sans.variable} ${mono.variable}`} suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
-      </head>
+    <html lang="fr" className={`${sans.variable} ${mono.variable}`}>
       <body className="bg-zinc-950 font-sans text-zinc-100 antialiased">{children}</body>
     </html>
   );
