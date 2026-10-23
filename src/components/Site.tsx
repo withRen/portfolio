@@ -1,17 +1,46 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import InfoPanel, { type PanelId } from './InfoPanel';
 import Landing from './Landing';
-import Portfolio from './Portfolio';
+import Portfolio, { type Filter } from './Portfolio';
+import SideDial, { type DialId } from './SideDial';
 
 export default function Site() {
   const [panel, setPanel] = useState<PanelId>(null);
+  const [filter, setFilter] = useState<Filter>('all');
+  const [section, setSection] = useState<'intro' | 'catalogue'>('intro');
+
+  useEffect(() => {
+    const targets = ['top', 'catalogue']
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) setSection(e.target.id === 'top' ? 'intro' : 'catalogue');
+        });
+      },
+      { rootMargin: '-50% 0px -50% 0px' },
+    );
+    targets.forEach((t) => io.observe(t));
+    return () => io.disconnect();
+  }, []);
+
+  const select = (id: DialId) => {
+    if (id === 'intro') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    setFilter(id);
+    document.getElementById('catalogue')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
     <>
       <Landing onPanel={setPanel} />
-      <Portfolio onPanel={setPanel} />
+      <Portfolio filter={filter} onFilter={setFilter} onPanel={setPanel} />
+      <SideDial active={section === 'intro' ? 'intro' : filter} onSelect={select} />
       <InfoPanel panel={panel} onClose={() => setPanel(null)} />
     </>
   );

@@ -1,13 +1,13 @@
 'use client';
 
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { kindLabel, works, type Kind, type Work } from '@/data/content';
 import GridView from './GridView';
 import Lightbox from './Lightbox';
 import ListView from './ListView';
 import SliderView from './SliderView';
 
-type Filter = 'all' | Kind;
+export type Filter = 'all' | Kind;
 type View = 'list' | 'grid' | 'slider';
 
 const filters: { id: Filter; label: string }[] = [
@@ -42,8 +42,13 @@ function ViewSwitch({ view, onChange, className }: { view: View; onChange: (v: V
   );
 }
 
-export default function Portfolio({ onPanel }: { onPanel: (p: 'about' | 'contact') => void }) {
-  const [filter, setFilter] = useState<Filter>('all');
+type Props = {
+  filter: Filter;
+  onFilter: (f: Filter) => void;
+  onPanel: (p: 'about' | 'contact') => void;
+};
+
+export default function Portfolio({ filter, onFilter, onPanel }: Props) {
   const [view, setView] = useState<View>('list');
   const [lightbox, setLightbox] = useState<number | null>(null);
   const [active, setActive] = useState(0);
@@ -51,6 +56,10 @@ export default function Portfolio({ onPanel }: { onPanel: (p: 'about' | 'contact
   const registerGo = useCallback((fn: (delta: number) => void) => {
     go.current = fn;
   }, []);
+
+  useEffect(() => {
+    setActive(0);
+  }, [filter]);
 
   const items = useMemo(() => (filter === 'all' ? works : works.filter((w) => w.kind === filter)), [filter]);
   const photos = useMemo(() => items.filter((w) => w.kind === 'photo'), [items]);
@@ -66,7 +75,7 @@ export default function Portfolio({ onPanel }: { onPanel: (p: 'about' | 'contact
 
   const openPhoto = (w: Work) => setLightbox(photos.findIndex((p) => p.id === w.id));
   const changeFilter = (f: Filter) => {
-    setFilter(f);
+    onFilter(f);
     setActive(0);
   };
   const changeView = (v: View) => {

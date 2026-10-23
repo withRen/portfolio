@@ -6,7 +6,6 @@ import WaveCanvas from './WaveCanvas';
 
 type Props = { onPanel: (p: 'about' | 'contact') => void };
 
-const TICKS = 9;
 const clamp = (n: number, min = 0, max = 1) => Math.min(max, Math.max(min, n));
 const smooth = (t: number) => t * t * (3 - 2 * t);
 
@@ -18,7 +17,6 @@ export default function Landing({ onPanel }: Props) {
   const img = useRef<HTMLDivElement>(null);
   const title = useRef<HTMLDivElement>(null);
   const hint = useRef<HTMLDivElement>(null);
-  const ticks = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -45,13 +43,6 @@ export default function Landing({ onPanel }: Props) {
         title.current.style.transform = `translateY(${((1 - o) * 18).toFixed(1)}px)`;
       }
       if (hint.current) hint.current.style.opacity = (1 - clamp(p / 0.25)).toFixed(3);
-      if (ticks.current) {
-        const current = Math.round(raw * (TICKS - 1));
-        Array.from(ticks.current.children).forEach((el, i) => {
-          (el as HTMLElement).style.width = i === current ? '1.5rem' : '0.75rem';
-          (el as HTMLElement).style.opacity = i === current ? '1' : '0.55';
-        });
-      }
     };
 
     const onScroll = () => {
@@ -133,12 +124,6 @@ export default function Landing({ onPanel }: Props) {
             <button type="button" onClick={() => onPanel('contact')} className={`label ${underline}`}>
               Me contacter
             </button>
-          </div>
-
-          <div ref={ticks} aria-hidden className="absolute left-5 top-1/2 hidden -translate-y-1/2 flex-col gap-2.5 md:left-10 md:flex">
-            {Array.from({ length: TICKS }, (_, i) => (
-              <span key={i} className="block h-px bg-current transition-[width,opacity] duration-500 ease-out-expo" style={{ width: '0.75rem', opacity: 0.55 }} />
-            ))}
           </div>
 
           <div ref={hint} aria-hidden className="absolute bottom-6 right-5 md:bottom-8 md:right-10">
