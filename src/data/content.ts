@@ -68,7 +68,6 @@ const video = (id: string, title: string, type: string): Video => ({
 });
 
 export const videos: Video[] = [
-  video('2CmLxsLWXKE', 'Was that the right way', 'Court-métrage narratif'),
   video('zNx36iwjhD8', 'Pub de montre', 'Publicité produit'),
   video('aPt2vD_mj0k', 'Publicité sur la musique', 'Court-métrage publicitaire'),
   video('OSng25-tAkc', 'Europe en 2100', 'Documentaire fictif'),
