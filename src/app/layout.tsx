@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Barlow_Condensed, Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 
 const sans = Geist({ subsets: ['latin'], variable: '--font-geist-sans', display: 'swap' });
 const mono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono', display: 'swap' });
+
+const display = Barlow_Condensed({ subsets: ['latin'], weight: ['700'], variable: '--font-barlow', display: 'swap' });
 
 export const metadata: Metadata = {
   title: 'Rahim Tamhaev — Développeur et créatif',
@@ -23,7 +25,7 @@ export const viewport: Viewport = { themeColor: '#09090b' };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" className={`${sans.variable} ${mono.variable}`}>
+    <html lang="fr" className={`${sans.variable} ${mono.variable} ${display.variable}`}>
       <body className="bg-zinc-950 font-sans text-zinc-100 antialiased">{children}</body>
     </html>
   );

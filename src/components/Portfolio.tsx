@@ -1,17 +1,14 @@
 'use client';
 
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { ArrowUpRight } from '@phosphor-icons/react';
-import { kindLabel, socials, tools, works, type Kind, type Work } from '@/data/content';
+import { kindLabel, works, type Kind, type Work } from '@/data/content';
 import GridView from './GridView';
 import Lightbox from './Lightbox';
 import ListView from './ListView';
-import Panel from './Panel';
 import SliderView from './SliderView';
 
 type Filter = 'all' | Kind;
 type View = 'list' | 'grid' | 'slider';
-type PanelId = 'about' | 'contact' | null;
 
 const filters: { id: Filter; label: string }[] = [
   { id: 'all', label: 'Tout' },
@@ -45,10 +42,9 @@ function ViewSwitch({ view, onChange, className }: { view: View; onChange: (v: V
   );
 }
 
-export default function Portfolio() {
+export default function Portfolio({ onPanel }: { onPanel: (p: 'about' | 'contact') => void }) {
   const [filter, setFilter] = useState<Filter>('all');
   const [view, setView] = useState<View>('list');
-  const [panel, setPanel] = useState<PanelId>(null);
   const [lightbox, setLightbox] = useState<number | null>(null);
   const [active, setActive] = useState(0);
   const go = useRef<(delta: number) => void>(() => {});
@@ -82,11 +78,11 @@ export default function Portfolio() {
   const isSlider = view === 'slider';
 
   return (
-    <div className="grid h-[100dvh] grid-cols-[minmax(0,1fr)] grid-rows-[auto_minmax(0,1fr)_auto]">
+    <div id="catalogue" className="grid h-[100dvh] grid-cols-[minmax(0,1fr)] grid-rows-[auto_minmax(0,1fr)_auto]">
       <header className="border-b border-zinc-800">
         <div className="mx-auto grid max-w-[1440px] grid-cols-[1fr_auto] items-center gap-x-6 gap-y-3 px-5 py-4 md:grid-cols-[1fr_auto_1fr] md:px-10">
           <div className="flex items-center gap-5">
-            <h1 className="sr-only">Rahim Tamhaev, développeur et vidéaste</h1>
+            <h2 className="sr-only">Catalogue des réalisations</h2>
             <span aria-hidden className="text-lg font-semibold tracking-tighter">
               RT
             </span>
@@ -118,10 +114,10 @@ export default function Portfolio() {
           <div className="flex items-center justify-end gap-6">
             <ViewSwitch view={view} onChange={changeView} className="hidden md:flex" />
             <span aria-hidden className="hidden h-4 w-px bg-zinc-800 md:block" />
-            <button type="button" onClick={() => setPanel('about')} className={tab(false)}>
+            <button type="button" onClick={() => onPanel('about')} className={tab(false)}>
               À propos
             </button>
-            <button type="button" onClick={() => setPanel('contact')} className={tab(false)}>
+            <button type="button" onClick={() => onPanel('contact')} className={tab(false)}>
               Contact
             </button>
           </div>
@@ -207,70 +203,6 @@ export default function Portfolio() {
         onClose={() => setLightbox(null)}
       />
 
-      <Panel
-        open={panel !== null}
-        title={panel === 'contact' ? 'Contact' : 'À propos'}
-        onClose={() => setPanel(null)}
-      >
-        {panel === 'about' && (
-          <div className="flex flex-col gap-10">
-            <p className="max-w-[30ch] text-2xl font-medium leading-snug tracking-tight md:text-3xl">
-              Mi-développeur, mi-vidéaste. Je code des interfaces et je filme des histoires.
-            </p>
-            <p className="max-w-[48ch] leading-relaxed text-zinc-400">
-              Étudiant en BUT MMI. Développement web, mobile et desktop, création audiovisuelle et photographie.
-            </p>
-            <div>
-              <p className="label mb-3 text-zinc-500">Outils</p>
-              <ul className="flex flex-col divide-y divide-zinc-800 border-y border-zinc-800">
-                {tools.map((t) => (
-                  <li key={t} className="py-3 text-zinc-300">
-                    {t}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <p className="label text-zinc-600">&copy; 2026 Rahim Tamhaev</p>
-          </div>
-        )}
-        {panel === 'contact' && (
-          <div className="flex flex-col gap-10">
-            <p className="text-5xl font-semibold leading-[0.95] tracking-tighter md:text-6xl">
-              Un projet,
-              <br />
-              une idée ?
-            </p>
-            <a
-              href="https://www.linkedin.com/in/rahim-tamhaev"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group inline-flex items-center gap-3 self-start border-b border-zinc-600 pb-2 text-xl font-medium tracking-tight transition-colors duration-300 hover:border-accent hover:text-accent active:scale-[0.98]"
-            >
-              Écrire sur LinkedIn
-              <ArrowUpRight
-                size={22}
-                weight="regular"
-                aria-hidden
-                className="transition-transform duration-500 ease-out-expo group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-              />
-            </a>
-            <ul className="label flex gap-7 text-zinc-500">
-              {socials.map((s) => (
-                <li key={s.label}>
-                  <a
-                    href={s.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="transition-colors duration-300 hover:text-accent"
-                  >
-                    {s.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </Panel>
     </div>
   );
 }
