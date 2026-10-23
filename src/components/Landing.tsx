@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { asset } from '@/data/content';
+import Logo from './Logo';
 import WaveCanvas from './WaveCanvas';
 
 type Props = { onNav: (id: string) => void };
@@ -123,7 +124,7 @@ export default function Landing({ onNav }: Props) {
 
         <div className="pointer-events-none absolute inset-0 z-10 text-white mix-blend-difference">
           <div className="pointer-events-auto absolute left-5 top-5 flex items-center gap-3 md:left-10 md:top-8">
-            <span className="text-lg font-semibold tracking-tighter">RT</span>
+            <Logo className="size-8 md:size-9" />
             <span className="label hidden leading-snug lg:block">
               Rahim Tamhaev
               <br />

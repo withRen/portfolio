@@ -1,5 +1,6 @@
 import { ArrowUpRight } from '@phosphor-icons/react/dist/ssr';
 import { contactHref, socials, tools } from '@/data/content';
+import Logo from './Logo';
 import Reveal from './Reveal';
 
 export default function ContactSection() {
@@ -36,7 +37,10 @@ export default function ContactSection() {
       </div>
 
       <footer className="mx-auto mt-24 flex max-w-[1400px] flex-wrap items-center justify-between gap-x-8 gap-y-4 border-t border-white/10 px-5 pt-6 md:mt-36 md:px-10">
-        <span className="text-sm text-zinc-500">&copy; 2026 Rahim Tamhaev</span>
+        <span className="flex items-center gap-3 text-sm text-zinc-500">
+          <Logo className="size-6 text-zinc-300" title="" />
+          &copy; 2026 Rahim Tamhaev
+        </span>
         <ul className="flex gap-6 text-sm text-zinc-400">
           {socials.map((s) => (
             <li key={s.label}>
