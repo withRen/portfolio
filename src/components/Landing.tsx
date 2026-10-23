@@ -17,6 +17,7 @@ export default function Landing({ onPanel }: Props) {
   const img = useRef<HTMLDivElement>(null);
   const title = useRef<HTMLDivElement>(null);
   const backdrop = useRef<HTMLDivElement>(null);
+  const shadow = useRef<HTMLDivElement>(null);
   const hint = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -38,6 +39,14 @@ export default function Landing({ onPanel }: Props) {
         frame.current.style.pointerEvents = p > 0.9 ? 'auto' : 'none';
       }
       if (backdrop.current) backdrop.current.style.opacity = p.toFixed(3);
+      if (shadow.current) {
+        const st = shadow.current.style;
+        st.top = `${(end.t * p).toFixed(2)}%`;
+        st.bottom = `${(end.b * p).toFixed(2)}%`;
+        st.left = st.right = `${(end.x * p).toFixed(2)}%`;
+        st.borderRadius = `${(20 * p).toFixed(1)}px`;
+        st.opacity = clamp(p * 1.5).toFixed(3);
+      }
       if (img.current) img.current.style.transform = `scale(${(1.15 - 0.15 * p).toFixed(4)})`;
       if (title.current) {
         const o = clamp((p - 0.5) / 0.4);
@@ -72,10 +81,16 @@ export default function Landing({ onPanel }: Props) {
             src={asset('/photos/dunes.png')}
             alt=""
             draggable={false}
-            className="absolute inset-0 size-full scale-125 object-cover blur-2xl"
+            className="absolute inset-0 size-full scale-125 object-cover blur-2xl brightness-[0.33] saturate-[1.25]"
           />
-          <div className="absolute inset-0 bg-[rgb(30_32_33/0.8)]" />
+          <div className="absolute inset-0 bg-[rgb(10_11_12/0.3)]" />
         </div>
+
+        <div
+          ref={shadow}
+          aria-hidden
+          className="absolute bg-black opacity-0 shadow-[0_40px_100px_-10px_rgb(0_0_0/0.65),0_14px_36px_rgb(0_0_0/0.4)]"
+        />
 
         <div
           ref={title}
