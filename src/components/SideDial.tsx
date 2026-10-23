@@ -14,10 +14,30 @@ const items: { id: DialId; label: string }[] = [
 
 const W = 120;
 const H = 240;
-const STEP = 22; // degrees between two labels on the arc
+const STEP = 30; // degrees between two labels on the wheel
+const LABEL_R = 34; // labels start at this radius and read outward
 const rad = (d: number) => (d * Math.PI) / 180;
 
-const ticks = Array.from({ length: 29 }, (_, i) => -84 + i * 6);
+// A full ring of ticks, so the wheel can turn without running out of them
+const ticks = Array.from({ length: 60 }, (_, i) => -180 + i * 6);
+
+/**
+ * Best-effort haptic tick. Web pages cannot drive Mac or Windows trackpad haptics;
+ * this covers Android (Vibration API) and iOS Safari 17.4+ (toggling a native
+ * switch control plays the system haptic).
+ */
+function haptic(iosSwitch: HTMLLabelElement | null) {
+  if (typeof navigator === 'undefined') return;
+  if ('vibrate' in navigator) {
+    try {
+      navigator.vibrate(8);
+    } catch {
+      /* ignored: not allowed before a user gesture */
+    }
+  }
+  const ios = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (ios) iosSwitch?.click();
+}
 
 type Props = { active: DialId; onSelect: (id: DialId) => void };
 
@@ -27,17 +47,59 @@ export default function SideDial({ active, onSelect }: Props) {
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const flashTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const first = useRef(true);
+  const ring = useRef<SVGGElement>(null);
+  const arms = useRef<(HTMLDivElement | null)[]>([]);
+  const iosSwitch = useRef<HTMLLabelElement>(null);
 
-  // Open briefly when the current section changes
+  // Open briefly and tick when the current section changes
   useEffect(() => {
     if (first.current) {
       first.current = false;
       return;
     }
+    haptic(iosSwitch.current);
     setFlash(true);
     if (flashTimer.current) clearTimeout(flashTimer.current);
     flashTimer.current = setTimeout(() => setFlash(false), 1300);
   }, [active]);
+
+  // Continuous position along the sections (2.4 = 40% through the 3rd one) turns the wheel
+  useEffect(() => {
+    let raf: number | null = null;
+    const apply = () => {
+      raf = null;
+      const mid = window.scrollY + window.innerHeight / 2;
+      let pos = 0;
+      items.forEach((item, i) => {
+        const el = document.getElementById(item.id);
+        if (!el) return;
+        const top = el.getBoundingClientRect().top + window.scrollY;
+        if (mid >= top) pos = i + Math.min(1, (mid - top) / Math.max(1, el.offsetHeight)) - 0.5;
+      });
+      pos = Math.max(0, Math.min(items.length - 1, pos));
+      ring.current?.setAttribute('transform', `rotate(${(-pos * STEP).toFixed(2)} 0 ${H / 2})`);
+      arms.current.forEach((arm, i) => {
+        if (!arm) return;
+        const d = i - pos;
+        const dist = Math.abs(d);
+        arm.style.transform = `rotate(${(d * STEP).toFixed(2)}deg)`;
+        arm.style.opacity = String(Math.max(0, 1 - dist * 0.38));
+        const label = arm.firstElementChild as HTMLElement | null;
+        if (label) label.style.transform = `translateY(-50%) scale(${(1.12 - Math.min(dist, 1) * 0.22).toFixed(3)})`;
+      });
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(apply);
+    };
+    apply();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
 
   useEffect(
     () => () => {
@@ -67,6 +129,10 @@ export default function SideDial({ active, onSelect }: Props) {
       onFocus={enter}
       onBlur={leave}
     >
+      {/* Hidden native switch: clicking its label gives a haptic tick on iOS Safari */}
+      <input type="checkbox" id="dial-haptic" aria-hidden tabIndex={-1} className="sr-only" {...{ switch: '' }} />
+      <label ref={iosSwitch} htmlFor="dial-haptic" aria-hidden className="sr-only" />
+
       {/* Half disc: collapses to a small bar on the screen edge */}
       <div
         aria-hidden
@@ -96,46 +162,51 @@ export default function SideDial({ active, onSelect }: Props) {
         style={{ clipPath: `inset(0px 0px 0px 0px round 0 ${W}px ${W}px 0)` }}
       >
         <svg width={W} height={H} className="absolute inset-0" aria-hidden>
-          {ticks.map((a) => (
-            <line
-              key={a}
-              x1={Math.cos(rad(a)) * 108}
-              y1={H / 2 + Math.sin(rad(a)) * 108}
-              x2={Math.cos(rad(a)) * (a % 30 === 0 ? 98 : 102)}
-              y2={H / 2 + Math.sin(rad(a)) * (a % 30 === 0 ? 98 : 102)}
-              stroke="white"
-              strokeOpacity={a === 0 ? 0 : 0.28}
-              strokeWidth="1"
-            />
-          ))}
-          <line x1="102" y1={H / 2} x2="114" y2={H / 2} stroke="var(--color-accent)" strokeWidth="1.5" />
+          <g ref={ring}>
+            {ticks.map((a) => {
+              const major = a % 30 === 0;
+              return (
+                <line
+                  key={a}
+                  x1={Math.cos(rad(a)) * 110}
+                  y1={H / 2 + Math.sin(rad(a)) * 110}
+                  x2={Math.cos(rad(a)) * (major ? 99 : 104)}
+                  y2={H / 2 + Math.sin(rad(a)) * (major ? 99 : 104)}
+                  stroke="white"
+                  strokeOpacity={major ? 0.45 : 0.22}
+                  strokeWidth="1"
+                />
+              );
+            })}
+          </g>
+          <line x1="100" y1={H / 2} x2="116" y2={H / 2} stroke="var(--color-accent)" strokeWidth="1.5" />
         </svg>
 
         {items.map((item, i) => {
-          const d = i - activeIndex;
-          const a = d * STEP;
-          const visible = Math.abs(d) <= 2;
-          const x = 14 + 52 * Math.cos(rad(a));
-          const y = H / 2 + 100 * Math.sin(rad(a));
-          const isActive = d === 0;
+          const isActive = i === activeIndex;
           return (
-            <button
+            // Zero-size arm pinned at the wheel centre; rotating it tilts the label along the wheel
+            <div
               key={item.id}
-              type="button"
-              tabIndex={open && visible ? 0 : -1}
-              aria-current={isActive ? 'true' : undefined}
-              onClick={() => onSelect(item.id)}
-              className={`label absolute left-0 top-0 whitespace-nowrap transition-[transform,opacity,color] duration-500 ease-out-expo hover:text-zinc-50 ${
-                isActive ? 'text-zinc-50' : 'text-zinc-500'
-              }`}
-              style={{
-                transform: `translate(${x}px, ${y}px) translate(-50%, -50%) scale(${isActive ? 1.15 : 0.9})`,
-                opacity: !visible ? 0 : isActive ? 1 : Math.abs(d) === 1 ? 0.75 : 0.35,
-                pointerEvents: visible ? 'auto' : 'none',
+              ref={(el) => {
+                arms.current[i] = el;
               }}
+              className="absolute left-0 h-0 w-0 origin-left"
+              style={{ top: H / 2 }}
             >
-              {item.label}
-            </button>
+              <button
+                type="button"
+                tabIndex={open ? 0 : -1}
+                aria-current={isActive ? 'true' : undefined}
+                onClick={() => onSelect(item.id)}
+                className={`label absolute top-0 origin-left whitespace-nowrap py-1 transition-colors duration-300 hover:text-zinc-50 ${
+                  isActive ? 'text-zinc-50' : 'text-zinc-500'
+                }`}
+                style={{ left: LABEL_R }}
+              >
+                {item.label}
+              </button>
+            </div>
           );
         })}
       </div>
