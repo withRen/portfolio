@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { asset } from '@/data/content';
+import WaveCanvas from './WaveCanvas';
 
 type Props = { onPanel: (p: 'about' | 'contact') => void };
 
@@ -14,7 +15,7 @@ const underline = 'border-b border-current pb-0.5 transition-opacity duration-30
 export default function Landing({ onPanel }: Props) {
   const section = useRef<HTMLElement>(null);
   const frame = useRef<HTMLDivElement>(null);
-  const img = useRef<HTMLImageElement>(null);
+  const img = useRef<HTMLDivElement>(null);
   const title = useRef<HTMLDivElement>(null);
   const hint = useRef<HTMLDivElement>(null);
   const ticks = useRef<HTMLDivElement>(null);
@@ -90,15 +91,20 @@ export default function Landing({ onPanel }: Props) {
             aria-label="Voir le catalogue"
             className="block size-full cursor-pointer overflow-hidden"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <div
               ref={img}
-              src={asset('/photos/dunes.png')}
-              alt="Dunes sombres sous un ciel clair"
-              draggable={false}
-              className="size-full origin-center object-cover will-change-transform"
+              className="relative size-full origin-center will-change-transform"
               style={{ transform: 'scale(1.15)' }}
-            />
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={asset('/photos/dunes.png')}
+                alt="Dunes sombres sous un ciel clair"
+                draggable={false}
+                className="absolute inset-0 size-full object-cover"
+              />
+              <WaveCanvas src={asset('/photos/dunes.png')} />
+            </div>
           </button>
         </div>
 
