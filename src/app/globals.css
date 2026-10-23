@@ -135,6 +135,28 @@ body {
   .pg-grid:has(.pg-tile:hover) .pg-tile:not(:hover) { opacity: 0.35; }
 }
 
+/* Project sticky stack (see ProjectSection). Flat list on mobile and without support. */
+@keyframes ps-recede {
+  from { transform: none; filter: brightness(1); }
+  to { transform: translateY(-3vh) scale(0.9); filter: brightness(0.45); }
+}
+@media (min-width: 768px) {
+  .ps-slot { height: 100dvh; padding-block: 5dvh; }
+  .ps-slot:last-child { height: auto; }
+  .ps-card { position: sticky; top: 6dvh; height: 88dvh; }
+}
+@supports (animation-timeline: view()) {
+  @media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+    .ps-recede {
+      animation-name: ps-recede;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-range: entry 0% entry 100%;
+      transform-origin: 50% 0%;
+    }
+  }
+}
+
 /* Glass surfaces fall back to solid fills when transparency is unwanted */
 @media (prefers-reduced-transparency: reduce) {
   .glass {

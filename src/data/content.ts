@@ -14,6 +14,20 @@ export type Project = {
   status?: string;
 };
 
+export type Featured = {
+  id: string;
+  title: string;
+  tagline: string;
+  desc: string;
+  context: string;
+  stack: string[];
+  cover: string;
+  extra?: string;
+  links: { label: string; href: string }[];
+  layout: 'split' | 'stack' | 'split-reverse' | 'full';
+};
+
+
 const photo = (file: string, title: string, h: number): Photo => ({
   id: file,
   title,
@@ -62,7 +76,61 @@ export const videos: Video[] = [
   video('IzuP73MLAhQ', 'Intro Kill Bill', 'Générique alternatif'),
 ];
 
-export const projects: Project[] = [
+export const featured: Featured[] = [
+  {
+    id: 'escapor',
+    title: 'The Last Escapor',
+    tagline: 'Survival shooter en réalité virtuelle.',
+    desc: 'Seul dans un bunker, tu cloues des planches au marteau sur les ouvertures et tu tires sur les zombies en surveillant les caméras.',
+    context: 'SAÉ 5.D.01, BUT MMI 3',
+    stack: ['Unity 6', 'C#', 'XR Interaction Toolkit', 'Meta Quest 3'],
+    cover: asset('/projects/escapor.jpg'),
+    links: [{ label: 'Code source', href: 'https://github.com/withRen/SAE501' }],
+    layout: 'split',
+  },
+  {
+    id: 'mmi-town',
+    title: 'MMI Town V2',
+    tagline: 'Le serveur Minecraft des étudiants MMI de Béziers.',
+    desc: 'Un hub multijeux : lobby central et trois mondes isolés (survie avec métiers, Loup-Garou de Thiercelieux, PvP en 3 contre 3), connexion sécurisée et bot Discord.',
+    context: 'Projet communautaire',
+    stack: ['Java', 'Paper 26.3', 'Python', 'discord.py'],
+    cover: asset('/projects/mmi-town.jpg'),
+    extra: asset('/projects/mmi-town-launcher.jpg'),
+    links: [],
+    layout: 'stack',
+  },
+  {
+    id: 'devtober',
+    title: 'Devtober 2026',
+    tagline: 'Un mot par jour, une création en code.',
+    desc: "Un défi d'octobre façon Inktober : un générateur de sons en Web Audio, des fonds d'écran à particules, une chambre noire en WebGPU.",
+    context: 'Projet personnel',
+    stack: ['JavaScript', 'Web Audio', 'WebGL', 'WebGPU'],
+    cover: asset('/projects/devtober-loop.jpg'),
+    extra: asset('/projects/devtober-home.jpg'),
+    links: [
+      { label: 'Pulse', href: 'https://withren.github.io/devtober/day-01-pulse/' },
+      { label: 'Loop', href: 'https://withren.github.io/devtober/day-02-loop/' },
+      { label: 'Bloom', href: 'https://withren.github.io/devtober/day-03-bloom/' },
+      { label: 'Tous les jours', href: 'https://withren.github.io/devtober/' },
+    ],
+    layout: 'split-reverse',
+  },
+  {
+    id: 'immanence',
+    title: 'Immanence',
+    tagline: 'Séjours bien-être à Djerba.',
+    desc: 'Thème WordPress sur mesure pour des retraites de bien-être, avec interface personnalisée et back-office optimisé.',
+    context: 'Site client en ligne',
+    stack: ['WordPress', 'PHP', 'UI / UX'],
+    cover: asset('/projects/immanence.jpg'),
+    links: [{ label: 'Voir le site', href: 'https://www.imma-nence.com/' }],
+    layout: 'full',
+  },
+];
+
+export const otherProjects: Project[] = [
   {
     id: 'nightly',
     title: 'Nightly',
@@ -83,14 +151,6 @@ export const projects: Project[] = [
     desc: "Logiciel desktop d'entraînement à la visée, avec statistiques et graphiques de précision.",
     stack: ['Electron', 'TypeScript'],
     href: 'https://github.com/Armfy/aim-trainer-pro',
-  },
-  {
-    id: 'immanence',
-    title: 'Immanence',
-    desc: 'Thème WordPress sur mesure pour des retraites de bien-être, avec interface personnalisée et back-office optimisé. Site client en ligne.',
-    stack: ['WordPress', 'PHP', 'UI / UX'],
-    href: 'https://www.imma-nence.com/',
-    image: asset('/photos/immanence_thumbnail.png'),
   },
   {
     id: 'zwyx',
