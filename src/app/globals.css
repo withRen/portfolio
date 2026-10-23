@@ -99,10 +99,24 @@ dialog::backdrop {
   from { opacity: 0; }
   to { opacity: 1; }
 }
-.backdrop-in { animation: fade-in 0.9s var(--ease-out-expo) both; }
+/* New backdrop layers rise in behind a soft wave edge */
+@keyframes wave-wipe {
+  from { -webkit-mask-position: 0 0%; mask-position: 0 0%; }
+  to { -webkit-mask-position: 0 100%; mask-position: 0 100%; }
+}
+.backdrop-in {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 300' preserveAspectRatio='none'%3E%3Cpath d='M0 112 C 12 100 25 100 37 108 S 62 122 75 112 S 92 100 100 106 L 100 300 L 0 300 Z' fill='%23fff'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 300' preserveAspectRatio='none'%3E%3Cpath d='M0 112 C 12 100 25 100 37 108 S 62 122 75 112 S 92 100 100 106 L 100 300 L 0 300 Z' fill='%23fff'/%3E%3C/svg%3E");
+  -webkit-mask-size: 100% 300%;
+  mask-size: 100% 300%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  animation: wave-wipe 1.2s var(--ease-out-expo) both;
+}
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
+  .backdrop-in { -webkit-mask-image: none; mask-image: none; }
   *, *::before, *::after {
     animation: none !important;
     transition-duration: 0.01ms !important;

@@ -15,7 +15,7 @@ export default function Backdrop({ src }: { src: string }) {
       prev[prev.length - 1].src === src ? prev : [...prev.slice(-1), { id: ++counter.current, src }],
     );
     if (timer.current) clearTimeout(timer.current);
-    timer.current = setTimeout(() => setLayers((prev) => prev.slice(-1)), 1000);
+    timer.current = setTimeout(() => setLayers((prev) => prev.slice(-1)), 1300);
   }, [src]);
 
   useEffect(

@@ -16,7 +16,7 @@ export default function Landing({ onNav }: Props) {
   const frame = useRef<HTMLDivElement>(null);
   const img = useRef<HTMLDivElement>(null);
   const title = useRef<HTMLDivElement>(null);
-  const backdrop = useRef<HTMLDivElement>(null);
+  const stage = useRef<HTMLDivElement>(null);
   const shadow = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -37,7 +37,12 @@ export default function Landing({ onNav }: Props) {
         frame.current.style.clipPath = `inset(${(end.t * p).toFixed(2)}% ${(end.x * p).toFixed(2)}% ${(end.b * p).toFixed(2)}% ${(end.x * p).toFixed(2)}% round ${(28 * p).toFixed(1)}px)`;
         frame.current.style.pointerEvents = p > 0.9 ? 'auto' : 'none';
       }
-      if (backdrop.current) backdrop.current.style.opacity = p.toFixed(3);
+      // Exit: once pinned and fully zoomed out, the stage fades and recedes as the next section arrives
+      if (stage.current) {
+        const exit = reduce ? 0 : clamp((window.scrollY - vh) / (vh * 0.7));
+        stage.current.style.opacity = (1 - exit).toFixed(3);
+        stage.current.style.transform = exit > 0 ? `translateY(${(exit * -6).toFixed(2)}vh) scale(${(1 - exit * 0.05).toFixed(4)})` : '';
+      }
       if (shadow.current) {
         const st = shadow.current.style;
         st.top = `${(end.t * p).toFixed(2)}%`;
@@ -72,18 +77,7 @@ export default function Landing({ onNav }: Props) {
 
   return (
     <section ref={section} id="top" aria-label="Introduction" className="relative h-[200dvh] text-zinc-50">
-      <div className="sticky top-0 h-[100dvh] overflow-hidden bg-zinc-950">
-        <div ref={backdrop} aria-hidden className="absolute inset-0 opacity-0 will-change-[opacity]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={asset('/photos/dunes.png')}
-            alt=""
-            draggable={false}
-            className="absolute inset-0 size-full scale-125 object-cover blur-2xl brightness-[0.33] saturate-[1.25]"
-          />
-          <div className="absolute inset-0 bg-[rgb(10_11_12/0.3)]" />
-        </div>
-
+      <div ref={stage} className="sticky top-0 h-[100dvh] overflow-hidden">
         <div
           ref={shadow}
           aria-hidden
