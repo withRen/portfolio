@@ -16,6 +16,7 @@ export default function Landing({ onPanel }: Props) {
   const frame = useRef<HTMLDivElement>(null);
   const img = useRef<HTMLDivElement>(null);
   const title = useRef<HTMLDivElement>(null);
+  const backdrop = useRef<HTMLDivElement>(null);
   const hint = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -36,6 +37,7 @@ export default function Landing({ onPanel }: Props) {
         frame.current.style.clipPath = `inset(${(end.t * p).toFixed(2)}% ${(end.x * p).toFixed(2)}% ${(end.b * p).toFixed(2)}% ${(end.x * p).toFixed(2)}% round ${(20 * p).toFixed(1)}px)`;
         frame.current.style.pointerEvents = p > 0.9 ? 'auto' : 'none';
       }
+      if (backdrop.current) backdrop.current.style.opacity = p.toFixed(3);
       if (img.current) img.current.style.transform = `scale(${(1.15 - 0.15 * p).toFixed(4)})`;
       if (title.current) {
         const o = clamp((p - 0.5) / 0.4);
@@ -62,8 +64,19 @@ export default function Landing({ onPanel }: Props) {
   const toCatalogue = () => document.getElementById('catalogue')?.scrollIntoView({ behavior: 'smooth' });
 
   return (
-    <section ref={section} id="top" aria-label="Introduction" className="relative h-[200dvh] text-zinc-900">
-      <div className="sticky top-0 h-[100dvh] overflow-hidden bg-sky">
+    <section ref={section} id="top" aria-label="Introduction" className="relative h-[200dvh] text-zinc-50">
+      <div className="sticky top-0 h-[100dvh] overflow-hidden bg-zinc-950">
+        <div ref={backdrop} aria-hidden className="absolute inset-0 opacity-0 will-change-[opacity]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={asset('/photos/dunes.png')}
+            alt=""
+            draggable={false}
+            className="absolute inset-0 size-full scale-125 object-cover blur-2xl"
+          />
+          <div className="absolute inset-0 bg-[rgb(30_32_33/0.8)]" />
+        </div>
+
         <div
           ref={title}
           className="pointer-events-none absolute inset-x-0 top-[8%] px-5 text-center opacity-0 md:top-[7%]"
@@ -72,7 +85,7 @@ export default function Landing({ onPanel }: Props) {
             Rahim
             <br className="md:hidden" /> Tamhaev
           </h1>
-          <p className="label mt-3 text-zinc-600 md:mt-4">Développement · Vidéo · Photographie</p>
+          <p className="label mt-3 text-zinc-300 md:mt-4">Développement · Vidéo · Photographie</p>
         </div>
 
         <div ref={frame} className="absolute inset-0 will-change-[clip-path]" style={{ clipPath: 'inset(0% 0% 0% 0% round 0px)' }}>
