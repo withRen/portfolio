@@ -1,6 +1,6 @@
 import { ArrowUpRight } from '@phosphor-icons/react/dist/ssr';
 import { otherProjects } from '@/data/content';
-import ProjectShowcase from './ProjectShowcase';
+import ProjectStrip from './ProjectStrip';
 import Reveal from './Reveal';
 import SectionTitle from './SectionTitle';
 
@@ -14,7 +14,7 @@ export default function ProjectSection() {
           lead="Jeux, outils créatifs et sites sur mesure. Les projets sur lesquels j'ai le plus appris."
         />
       </div>
-      <ProjectShowcase />
+      <ProjectStrip />
 
       <div className="mx-auto max-w-[1400px] px-5 py-24 md:px-10 md:py-32">
         <Reveal className="sd-rise">
