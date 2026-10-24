@@ -135,6 +135,79 @@ body {
   .pg-grid:has(.pg-tile:hover) .pg-tile:not(:hover) { opacity: 0.35; }
 }
 
+/* Video projection room (see VideoSection). Static list by default. */
+@property --vd {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: -1;
+}
+.vd-section { display: none; }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .vd-static { display: none; }
+    .vd-section {
+      display: block;
+      height: calc((var(--n) + 1) * 100dvh);
+      view-timeline-name: --vdt;
+      view-timeline-axis: block;
+    }
+    /* Sentinels: one viewport per film, after the opening viewport */
+    .vd-sentinel { top: calc((var(--i) + 1) * 100dvh); height: 100dvh; }
+    .vd-stage {
+      position: sticky;
+      top: 0;
+      height: 100dvh;
+      overflow: hidden;
+      animation: vd-progress linear both;
+      animation-timeline: --vdt;
+      animation-range: contain 0% contain 100%;
+      --open: clamp(0, calc(var(--vd) + 1), 1);
+    }
+    .vd-giant {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-size: 26vw;
+      opacity: calc(1 - var(--open));
+      transform: scale(calc(1 + var(--open) * 0.25));
+    }
+    /* The screen opens from a small rounded window to (almost) full screen */
+    .vd-screen {
+      position: absolute;
+      inset: 0.75rem;
+      border-radius: 2.25rem;
+      transform: scale(calc(0.34 + var(--open) * 0.66));
+      box-shadow: 0 60px 140px -40px rgb(0 0 0 / 0.9);
+    }
+    .vd-film, .vd-caption {
+      --d: calc(var(--i) - max(var(--vd), 0));
+      --a: max(var(--d), calc(var(--d) * -1));
+    }
+    .vd-film {
+      opacity: clamp(0, calc(1.6 - var(--a) * 1.6), 1);
+      z-index: calc(10 - var(--a) * 3);
+    }
+    .vd-media { transform: scale(calc(1.12 - clamp(0, calc(1 - var(--a)), 1) * 0.06)) translateY(calc(var(--d) * 6%)); }
+    .vd-caption {
+      opacity: clamp(0, calc((1 - var(--a) * 2.4) * var(--open)), 1);
+      transform: translateY(calc(var(--d) * 64px));
+      z-index: calc(20 - var(--a) * 5);
+    }
+    .vd-strip { opacity: var(--open); z-index: 30; }
+
+    /* Leaving the photo wall: it recedes into the dark as the screen arrives */
+    .pg-stage {
+      animation: pg-exit linear both;
+      animation-timeline: --pg;
+      animation-range: exit 0% exit 70%;
+    }
+  }
+}
+@keyframes pg-exit {
+  to { opacity: 0; transform: scale(0.9) translateY(-4vh); }
+}
+
 /* Projects on a 3D arc (see ProjectSection). Static list by default. */
 @property --pj {
   syntax: '<number>';
