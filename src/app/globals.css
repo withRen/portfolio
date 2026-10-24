@@ -208,98 +208,28 @@ body {
   to { opacity: 0; transform: scale(0.9) translateY(-4vh); }
 }
 
-/* Projects on a 3D arc (see ProjectSection). Static list by default. */
-@property --pj {
-  syntax: '<number>';
-  inherits: true;
-  initial-value: 0;
+/* Project index (see ProjectIndex): names rise out of a mask as each row enters */
+@keyframes pi-line {
+  from { transform: translateY(105%); }
+  to { transform: none; }
 }
-.pj-section { display: none; }
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    .pj-static { display: none; }
-    .pj-section {
-      display: block;
-      height: calc(var(--n) * 90dvh + 100dvh);
-      view-timeline-name: --pjt;
-      view-timeline-axis: block;
-    }
-    .pj-stage {
-      position: sticky;
-      top: 0;
-      height: 100dvh;
-      overflow: hidden;
-      display: grid;
-      grid-template-columns: 1fr;
-      grid-template-rows: 48% 1fr;
-      animation: pj-progress linear both;
-      animation-timeline: --pjt;
-      animation-range: contain 5% contain 95%;
-    }
-    .pj-card, .pj-info, .pj-tick {
-      --d: calc(var(--i) - var(--pj));
-      --a: max(var(--d), calc(var(--d) * -1));
-    }
-    /* Image arc: active card flat in the middle, neighbours tilt away in perspective */
-    .pj-arc {
-      position: relative;
-      perspective: 1200px;
-      perspective-origin: 50% 50%;
-    }
-    .pj-card {
-      position: absolute;
-      inset: 12% 6%;
-      transform-origin: 50% 50%;
-      transform:
-        translate3d(0, calc(var(--d) * 78%), calc(var(--a) * -260px))
-        rotateX(calc(var(--d) * -38deg))
-        scale(calc(1 - var(--a) * 0.1));
-      opacity: clamp(0, calc(1 - var(--a) * 0.6), 1);
-      filter: brightness(calc(1 - var(--a) * 0.45));
-      z-index: calc(10 - var(--a) * 3);
-      will-change: transform;
-    }
-    .pj-card .pj-img {
-      transform: translateY(calc(var(--d) * -10%)) scale(1.22);
-    }
-    /* Text: only the nearest project is readable and clickable */
-    .pj-infos { position: relative; padding: 0 1.25rem 2rem; }
-    .pj-info {
-      position: absolute;
-      inset: 0 1.25rem auto;
-      opacity: clamp(0, calc(1 - var(--a) * 2.4), 1);
-      transform: translateY(calc(var(--d) * 56px));
-      z-index: calc(10 - var(--a) * 5);
-    }
-    .pj-rail { display: none; }
-    @media (min-width: 768px) {
-      .pj-stage {
-        grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-        grid-template-rows: 1fr;
-        max-width: 1400px;
-        margin-inline: auto;
-      }
-      .pj-infos { order: -1; align-self: center; height: 32rem; padding: 0 2.5rem; }
-      .pj-info { inset: 0 2.5rem auto; }
-      .pj-card { inset: 22% 8% 22% 4%; }
-      .pj-rail {
-        display: flex;
-        position: absolute;
-        right: 1.5rem;
-        top: 50%;
-        transform: translateY(-50%);
-        flex-direction: column;
-        gap: 0.6rem;
-      }
-      .pj-tick {
-        display: block;
-        height: 1px;
-        width: calc(0.75rem + clamp(0, calc(1 - var(--a)), 1) * 1.25rem);
-        background: var(--color-zinc-100);
-        opacity: calc(0.35 + clamp(0, calc(1 - var(--a)), 1) * 0.65);
-      }
+    .pi-line {
+      animation: pi-line linear both;
+      animation-timeline: view();
+      animation-range: entry 10% entry 90%;
     }
   }
+}
+/* Case-study image morph */
+::view-transition-group(pj-hero) {
+  animation-duration: 0.7s;
+  animation-timing-function: var(--ease-out-expo);
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.45s;
 }
 
 /* Glass surfaces fall back to solid fills when transparency is unwanted */

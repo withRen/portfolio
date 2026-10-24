@@ -28,7 +28,8 @@ const ticks = Array.from({ length: 60 }, (_, i) => -180 + i * 6);
  */
 function haptic(iosSwitch: HTMLLabelElement | null) {
   if (typeof navigator === 'undefined') return;
-  if ('vibrate' in navigator) {
+  const activated = (navigator as Navigator & { userActivation?: { hasBeenActive: boolean } }).userActivation?.hasBeenActive ?? true;
+  if ('vibrate' in navigator && activated) {
     try {
       navigator.vibrate(8);
     } catch {
