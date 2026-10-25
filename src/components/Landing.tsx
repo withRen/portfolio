@@ -7,6 +7,12 @@ import WaveCanvas from './WaveCanvas';
 
 type Props = { onNav: (id: string) => void };
 
+// Timeline in viewport heights of scroll: zoom out, hold the composed frame, then fade out.
+// The hold is long enough (and snapped) that a quick scroll cannot skip the composed frame.
+const ZOOM_END = 0.8;
+const EXIT_START = 1.6;
+const EXIT_LENGTH = 0.6;
+
 const clamp = (n: number, min = 0, max = 1) => Math.min(max, Math.max(min, n));
 const smooth = (t: number) => t * t * (3 - 2 * t);
 
@@ -30,7 +36,7 @@ export default function Landing({ onNav }: Props) {
     const apply = () => {
       raf = null;
       const vh = window.innerHeight;
-      const raw = reduce ? 1 : clamp(window.scrollY / (vh * 0.9));
+      const raw = reduce ? 1 : clamp(window.scrollY / (vh * ZOOM_END));
       const p = smooth(raw);
       const end = wide.matches ? { x: 19, t: 31, b: 13 } : { x: 6, t: 30, b: 20 };
 
@@ -40,7 +46,7 @@ export default function Landing({ onNav }: Props) {
       }
       // Exit: once pinned and fully zoomed out, the stage fades and recedes as the next section arrives
       if (stage.current) {
-        const exit = reduce ? 0 : clamp((window.scrollY - vh) / (vh * 0.7));
+        const exit = reduce ? 0 : clamp((window.scrollY - vh * EXIT_START) / (vh * EXIT_LENGTH));
         stage.current.style.opacity = (1 - exit).toFixed(3);
         stage.current.style.transform = exit > 0 ? `translateY(${(exit * -6).toFixed(2)}vh) scale(${(1 - exit * 0.05).toFixed(4)})` : '';
       }
@@ -77,7 +83,8 @@ export default function Landing({ onNav }: Props) {
   const toWork = () => onNav('photos');
 
   return (
-    <section ref={section} id="top" aria-label="Introduction" className="relative h-[200dvh] text-zinc-50">
+    <section ref={section} id="top" aria-label="Introduction" className="relative h-[300dvh] text-zinc-50">
+      <div aria-hidden className="intro-snap pointer-events-none absolute inset-x-0 h-px" style={{ top: `${((ZOOM_END + EXIT_START) / 2) * 100}dvh` }} />
       <div ref={stage} className="sticky top-0 h-[100dvh] overflow-hidden">
         <div
           ref={shadow}
