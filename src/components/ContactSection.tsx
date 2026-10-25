@@ -29,10 +29,14 @@ export default function ContactSection() {
             Étudiant en BUT MMI. Je développe des applications web, mobiles et desktop, et je réalise des vidéos et des
             photos.
           </p>
-          <div>
-            <h3 className="text-sm font-medium text-zinc-500">Outils</h3>
-            <p className="mt-2 leading-relaxed text-zinc-300">{tools.join(', ')}</p>
-          </div>
+          <dl className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
+            {tools.map((t) => (
+              <div key={t.group}>
+                <dt className="text-sm font-medium text-zinc-500">{t.group}</dt>
+                <dd className="mt-1.5 leading-relaxed text-zinc-300">{t.items.join(', ')}</dd>
+              </div>
+            ))}
+          </dl>
         </Reveal>
       </div>
 
