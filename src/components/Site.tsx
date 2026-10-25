@@ -5,6 +5,7 @@ import { asset } from '@/data/content';
 import Backdrop from './Backdrop';
 import ContactSection from './ContactSection';
 import Landing from './Landing';
+import Loader from './Loader';
 import PhotoSection from './PhotoSection';
 import ProjectSection from './ProjectSection';
 import SideDial, { type DialId } from './SideDial';
@@ -48,6 +49,7 @@ export default function Site() {
 
   return (
     <>
+      <Loader />
       <Backdrop src={backdrop} />
       <Landing onNav={nav} />
       <main>

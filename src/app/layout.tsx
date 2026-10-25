@@ -23,6 +23,11 @@ export const viewport: Viewport = { themeColor: '#09090b' };
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr" className={`${sans.variable} ${mono.variable} ${display.variable}`}>
+      <head>
+        <noscript>
+          <style>{'.site-loader{display:none}'}</style>
+        </noscript>
+      </head>
       <body className="font-sans text-zinc-100 antialiased">{children}</body>
     </html>
   );
