@@ -20,10 +20,14 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = { themeColor: '#09090b' };
 
+const SCROLL_MODE = `try{var d=document.documentElement;if(!matchMedia('(prefers-reduced-motion: reduce)').matches){var native=window.CSS&&CSS.supports('animation-timeline: view()')&&!/[?&]sd=js/.test(location.search);d.classList.add(native?'sd-native':'sd-js')}}catch(e){}`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" className={`${sans.variable} ${mono.variable} ${display.variable}`}>
+    <html lang="fr" className={`${sans.variable} ${mono.variable} ${display.variable}`} suppressHydrationWarning>
       <head>
+        {/* Pick the scroll animation mode before first paint (see globals.css and ScrollDriver) */}
+        <script dangerouslySetInnerHTML={{ __html: SCROLL_MODE }} />
         <noscript>
           <style>{'.site-loader{display:none}'}</style>
         </noscript>

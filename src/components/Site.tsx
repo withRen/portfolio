@@ -7,6 +7,7 @@ import ContactSection from './ContactSection';
 import Landing from './Landing';
 import Loader from './Loader';
 import PhotoSection from './PhotoSection';
+import ScrollDriver from './ScrollDriver';
 import ProjectSection from './ProjectSection';
 import SideDial, { type DialId } from './SideDial';
 import VideoSection from './VideoSection';
@@ -59,6 +60,7 @@ export default function Site() {
         <ContactSection />
       </main>
       <SideDial active={section} onSelect={nav} />
+      <ScrollDriver />
     </>
   );
 }
