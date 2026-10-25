@@ -186,7 +186,7 @@ export const otherProjects: Project[] = [
 export const tools: { group: string; items: string[] }[] = [
   {
     group: 'Développement',
-    items: ['VS Code', 'Xcode', 'React', 'Node.js', 'Three.js', 'Symfony', 'Django', 'WordPress', 'PrestaShop', 'Framer'],
+    items: ['VS Code', 'Xcode', 'Unity', 'React', 'Node.js', 'Three.js', 'Symfony', 'Django', 'WordPress', 'PrestaShop', 'Framer'],
   },
   { group: 'Création', items: ['Illustrator', 'Premiere Pro', 'InDesign', 'DaVinci Resolve', 'Figma'] },
   { group: 'Réseau', items: ['Wireshark', 'Cisco Packet Tracer', 'Proxmox'] },
