@@ -142,7 +142,7 @@ export default function VideoSection() {
                 aria-hidden={i !== active}
               >
                 <div className="vd-media absolute inset-0">
-                  <Thumb v={v} />
+                  <Thumb v={v} className="max-md:scale-[1.32]" />
                 </div>
                 {showPreview && i === active && (
                   <iframe
@@ -171,7 +171,7 @@ export default function VideoSection() {
             <ol className="absolute inset-0">
               {videos.map((v, i) => (
                 <li key={v.id} className="vd-caption absolute inset-x-0 bottom-0" style={{ '--i': i } as CSSProperties}>
-                  <div className="flex flex-col gap-6 p-6 pb-28 md:flex-row md:items-end md:justify-between md:p-12 md:pb-32">
+                  <div className="flex flex-col gap-6 p-6 pb-24 md:flex-row md:items-end md:justify-between md:p-12 md:pb-32">
                     <div>
                       <p className="label text-zinc-300">{v.type}</p>
                       <h3 className="mt-3 font-display text-5xl font-bold uppercase leading-[0.88] tracking-tight text-zinc-50 md:text-8xl">
@@ -211,7 +211,7 @@ export default function VideoSection() {
             {/* Film strip: jump to any film */}
             <ul
               aria-label="Films"
-              className="vd-strip absolute bottom-5 left-6 right-6 flex gap-2 md:bottom-8 md:left-12 md:right-auto"
+              className="vd-strip absolute bottom-8 left-12 hidden gap-2 md:flex"
             >
               {videos.map((v, i) => (
                 <li key={v.id}>

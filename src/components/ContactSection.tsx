@@ -40,7 +40,7 @@ export default function ContactSection() {
         </Reveal>
       </div>
 
-      <footer className="mx-auto mt-24 flex max-w-[1400px] flex-wrap items-center justify-between gap-x-8 gap-y-4 border-t border-white/10 px-5 pt-6 md:mt-36 md:px-10">
+      <footer className="mx-auto mt-24 flex max-w-[1400px] flex-wrap items-center justify-between gap-x-8 gap-y-4 border-t border-white/10 px-5 pb-24 pt-6 md:mt-36 md:px-10 md:pb-0">
         <span className="flex items-center gap-3 text-sm text-zinc-500">
           <Logo className="size-6 text-zinc-300" title="" />
           &copy; 2026 Rahim Tamhaev

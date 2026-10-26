@@ -97,6 +97,37 @@ export default function ProjectStrip() {
   const next = open !== null ? featured[(open + 1) % n] : null;
   const shown = featured[hovered];
 
+  // Touch screens have no hover: the slice closest to the centre of the screen is the active one
+  useEffect(() => {
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    let raf: number | null = null;
+    const pick = () => {
+      raf = null;
+      const mid = window.innerWidth / 2;
+      let best = 0;
+      let dist = Infinity;
+      slices.current.forEach((img, i) => {
+        const r = img?.parentElement?.getBoundingClientRect();
+        if (!r) return;
+        const d = Math.abs(r.left + r.width / 2 - mid);
+        if (d < dist) {
+          dist = d;
+          best = i;
+        }
+      });
+      setHovered((h) => (h === best ? h : best));
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(pick);
+    };
+    pick();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
   return (
     <>
       <div className="ab-section relative">
@@ -118,6 +149,7 @@ export default function ProjectStrip() {
                   onPointerEnter={() => setHovered(i)}
                   onFocus={() => setHovered(i)}
                   aria-label={`Ouvrir ${f.title}`}
+                  data-active={i === hovered}
                   className="group relative block h-[46dvh] w-[26vw] overflow-hidden bg-zinc-900 md:h-[48dvh] md:w-[10.5vw]"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -129,7 +161,7 @@ export default function ProjectStrip() {
                     alt=""
                     loading="lazy"
                     draggable={false}
-                    className="size-full scale-[1.02] object-cover brightness-75 grayscale transition-[filter,transform] duration-700 ease-out-expo group-hover:scale-110 group-hover:brightness-100 group-hover:grayscale-0 group-focus-visible:grayscale-0"
+                    className="size-full scale-[1.02] object-cover brightness-75 grayscale transition-[filter,transform] duration-700 ease-out-expo group-hover:scale-110 group-hover:brightness-100 group-hover:grayscale-0 group-focus-visible:grayscale-0 [@media(hover:none)]:group-data-[active=true]:scale-105 [@media(hover:none)]:group-data-[active=true]:brightness-100 [@media(hover:none)]:group-data-[active=true]:grayscale-0"
                   />
                 </button>
               </li>
@@ -137,7 +169,7 @@ export default function ProjectStrip() {
           </ul>
 
           {/* The hovered project, quietly, bottom left */}
-          <div className="pointer-events-none absolute bottom-8 left-5 md:bottom-12 md:left-10">
+          <div className="pointer-events-none absolute bottom-24 left-5 md:bottom-12 md:left-10">
             <p key={`c-${shown.id}`} className="row-in label text-zinc-500">
               {shown.context}
             </p>
@@ -207,7 +239,7 @@ export default function ProjectStrip() {
               <img
                 src={p.cover}
                 alt={`Aperçu de ${p.title}`}
-                className="aspect-[16/10] w-full object-cover"
+                className="aspect-[4/5] w-full object-cover md:aspect-[16/10]"
                 style={{ viewTransitionName: 'ab-hero' } as CSSProperties}
               />
               <h2

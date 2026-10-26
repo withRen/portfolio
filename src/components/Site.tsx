@@ -9,7 +9,7 @@ import Loader from './Loader';
 import PhotoSection from './PhotoSection';
 import ScrollDriver from './ScrollDriver';
 import ProjectSection from './ProjectSection';
-import SideDial, { type DialId } from './SideDial';
+import CameraDial, { type DialId } from './CameraDial';
 import VideoSection from './VideoSection';
 
 const SECTIONS: DialId[] = ['top', 'photos', 'videos', 'dev', 'contact'];
@@ -59,7 +59,7 @@ export default function Site() {
         <ProjectSection />
         <ContactSection />
       </main>
-      <SideDial active={section} onSelect={nav} />
+      <CameraDial active={section} onSelect={nav} />
       <ScrollDriver />
     </>
   );
