@@ -41,6 +41,31 @@ export default function ProjectStrip() {
   const [open, setOpen] = useState<number | null>(null);
   const dialog = useRef<HTMLDialogElement>(null);
   const slices = useRef<(HTMLImageElement | null)[]>([]);
+  const strip = useRef<HTMLUListElement>(null);
+
+  // The slices lean with the scroll speed, then settle
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    let raf: number | null = null;
+    let lastY = window.scrollY;
+    let skew = 0;
+    const tick = () => {
+      const y = window.scrollY;
+      const v = y - lastY;
+      lastY = y;
+      skew += (Math.max(-6, Math.min(6, v * 0.12)) - skew) * 0.15;
+      strip.current?.style.setProperty('--skew', `${skew.toFixed(2)}deg`);
+      raf = Math.abs(skew) > 0.02 || Math.abs(v) > 0 ? requestAnimationFrame(tick) : null;
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(tick);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
 
   const vt = (update: () => void) => {
     const doc = document as DocVT;
@@ -138,52 +163,71 @@ export default function ProjectStrip() {
             </div>
           </div>
 
-          <ul
-            className="ab-strip absolute flex gap-[1vw]"
+          {/* The active project's name, huge and faint, behind the strip */}
+          <p
+            key={`bg-${shown.id}`}
+            aria-hidden
+            className="ab-ghost pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 overflow-hidden whitespace-nowrap text-center font-display text-[30vw] font-bold uppercase leading-none tracking-tight text-white/[0.035] md:text-[19vw]"
           >
-            {featured.map((f, i) => (
-              <li key={f.id}>
-                <button
-                  type="button"
-                  onClick={() => openProject(i)}
-                  onPointerEnter={() => setHovered(i)}
-                  onFocus={() => setHovered(i)}
-                  aria-label={`Ouvrir ${f.title}`}
-                  data-active={i === hovered}
-                  className="group relative block h-[46dvh] w-[26vw] overflow-hidden bg-zinc-900 md:h-[48dvh] md:w-[10.5vw]"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    ref={(el) => {
-                      slices.current[i] = el;
-                    }}
-                    src={f.cover}
-                    alt=""
-                    loading="lazy"
-                    draggable={false}
-                    className="size-full scale-[1.02] object-cover brightness-75 grayscale transition-[filter,transform] duration-700 ease-out-expo group-hover:scale-110 group-hover:brightness-100 group-hover:grayscale-0 group-focus-visible:grayscale-0 [@media(hover:none)]:group-data-[active=true]:scale-105 [@media(hover:none)]:group-data-[active=true]:brightness-100 [@media(hover:none)]:group-data-[active=true]:grayscale-0"
-                  />
-                </button>
-              </li>
-            ))}
+            {shown.title}
+          </p>
+
+          <ul ref={strip} className="ab-strip absolute flex items-center gap-[0.7vw]">
+            {featured.map((f, i) => {
+              const isActive = i === hovered;
+              return (
+                <li key={f.id} className="ab-item">
+                  <button
+                    type="button"
+                    onClick={() => openProject(i)}
+                    onPointerEnter={() => setHovered(i)}
+                    onFocus={() => setHovered(i)}
+                    aria-label={`Ouvrir ${f.title}`}
+                    data-active={isActive}
+                    className={`group relative block h-[52dvh] overflow-hidden bg-zinc-900 transition-[width] duration-700 ease-out-expo md:h-[58dvh] ${
+                      isActive ? 'w-[58vw] md:w-[26vw]' : 'w-[14vw] md:w-[8.5vw]'
+                    }`}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      ref={(el) => {
+                        slices.current[i] = el;
+                      }}
+                      src={f.cover}
+                      alt=""
+                      loading="lazy"
+                      draggable={false}
+                      style={{ objectPosition: f.focus }}
+                      className={`size-full object-cover transition-[filter,transform] duration-700 ease-out-expo ${
+                        isActive ? 'scale-100 brightness-100 grayscale-0' : 'scale-110 brightness-[0.8] contrast-110 grayscale'
+                      }`}
+                    />
+                    <span className="label absolute left-3 top-3 text-zinc-50/70 mix-blend-difference md:left-4 md:top-4">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <span
+                      aria-hidden
+                      className={`absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-zinc-950/85 to-transparent p-4 pt-16 transition-opacity duration-500 md:p-5 ${
+                        isActive ? 'opacity-100 delay-200' : 'opacity-0'
+                      }`}
+                    >
+                      <span className="whitespace-nowrap font-display text-2xl font-bold uppercase leading-none tracking-tight text-zinc-50 md:text-3xl">
+                        {f.title}
+                      </span>
+                      <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-50 text-zinc-950">
+                        <ArrowUpRight size={14} weight="regular" />
+                      </span>
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
           </ul>
 
-          {/* The hovered project, quietly, bottom left */}
-          <div className="pointer-events-none absolute bottom-24 left-5 md:bottom-12 md:left-10">
-            <p key={`c-${shown.id}`} className="row-in label text-zinc-500">
-              {shown.context}
-            </p>
-            <p
-              key={shown.id}
-              aria-hidden
-              className="mt-2 overflow-hidden font-display text-4xl font-bold uppercase leading-[0.9] tracking-tight text-zinc-50 md:text-6xl"
-            >
-              {Array.from(shown.title).map((ch, k) => (
-                <span key={k} className="pl-letter inline-block" style={{ '--k': k } as CSSProperties}>
-                  {ch === ' ' ? ' ' : ch}
-                </span>
-              ))}
-            </p>
+          {/* The active project's context, quietly, bottom left */}
+          <div key={`c-${shown.id}`} className="row-in pointer-events-none absolute bottom-24 left-5 max-w-[34ch] md:bottom-24 md:left-10">
+            <p className="label text-zinc-500">{shown.context}</p>
+            <p className="mt-2 text-lg font-medium tracking-tight text-zinc-100 md:text-xl">{shown.tagline}</p>
           </div>
         </div>
       </div>

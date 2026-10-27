@@ -22,6 +22,8 @@ export type Featured = {
   context: string;
   stack: string[];
   cover: string;
+  /** object-position used when the cover is cropped into a narrow slice */
+  focus?: string;
   extra?: string;
   links: { label: string; href: string }[];
   layout: 'split' | 'stack' | 'split-reverse' | 'full';
@@ -84,6 +86,7 @@ export const featured: Featured[] = [
     context: 'SAÉ 5.D.01, BUT MMI 3',
     stack: ['Unity 6', 'C#', 'XR Interaction Toolkit', 'Meta Quest 3'],
     cover: asset('/projects/escapor.jpg'),
+    focus: '50% 35%',
     links: [{ label: 'Code source', href: 'https://github.com/withRen/SAE501' }],
     layout: 'split',
   },
@@ -95,6 +98,7 @@ export const featured: Featured[] = [
     context: 'Projet communautaire',
     stack: ['Java', 'Paper 26.3', 'Python', 'discord.py'],
     cover: asset('/projects/mmi-town.jpg'),
+    focus: '50% 40%',
     extra: asset('/projects/mmi-town-launcher.jpg'),
     links: [],
     layout: 'stack',
@@ -107,6 +111,7 @@ export const featured: Featured[] = [
     context: 'Devtober 2026, jour 01',
     stack: ['JavaScript', 'Web Audio API'],
     cover: asset('/projects/devtober-pulse.jpg'),
+    focus: '50% 48%',
     links: [{ label: 'Essayer', href: 'https://withren.github.io/devtober/day-01-pulse/' }],
     layout: 'split',
   },
@@ -118,6 +123,7 @@ export const featured: Featured[] = [
     context: 'Devtober 2026, jour 02',
     stack: ['JavaScript', 'WebGL 2'],
     cover: asset('/projects/devtober-loop.jpg'),
+    focus: '38% 40%',
     links: [{ label: 'Ouvrir le générateur', href: 'https://withren.github.io/devtober/day-02-loop/' }],
     layout: 'split',
   },
@@ -129,6 +135,7 @@ export const featured: Featured[] = [
     context: 'Devtober 2026, jour 03',
     stack: ['JavaScript', 'WebGPU', 'LibRaw'],
     cover: asset('/projects/devtober-bloom.jpg'),
+    focus: '40% 45%',
     links: [{ label: 'Développer une photo', href: 'https://withren.github.io/devtober/day-03-bloom/' }],
     layout: 'split',
   },
@@ -140,6 +147,7 @@ export const featured: Featured[] = [
     context: 'Site client en ligne',
     stack: ['WordPress', 'PHP', 'UI / UX'],
     cover: asset('/projects/immanence.jpg'),
+    focus: '68% 60%',
     links: [{ label: 'Voir le site', href: 'https://www.imma-nence.com/' }],
     layout: 'full',
   },

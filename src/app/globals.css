@@ -228,6 +228,8 @@ body {
   to { transform: translateX(calc(-100% + 38vw)); }
 }
 .ab-strip { left: 0; top: 50%; translate: 0 -50%; }
+.ab-item { transform: skewX(var(--skew, 0deg)); transform-origin: 50% 100%; }
+.ab-ghost { animation: fade-in 0.8s var(--ease-out-expo) both; }
 /* Default: a plain horizontally scrollable strip */
 .ab-stage .ab-strip { max-width: 100vw; overflow-x: auto; padding-inline: 1.25rem; }
 :is(.sd-native, .sd-js) .ab-section { height: 240dvh; view-timeline-name: --abt; view-timeline-axis: block; }
