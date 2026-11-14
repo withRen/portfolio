@@ -24,9 +24,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # Servi à la racine de tamhaev.dev : pas de préfixe de chemin
       - run: npm run build
-        env:
-          NEXT_PUBLIC_BASE_PATH: /portfolio
       - uses: actions/upload-pages-artifact@v3
         with:
           path: out

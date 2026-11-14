@@ -8,11 +8,19 @@ const mono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono', dis
 const display = Barlow_Condensed({ subsets: ['latin'], weight: ['700'], variable: '--font-barlow', display: 'swap' });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://tamhaev.dev'),
+  alternates: { canonical: '/' },
+  // Les liens sortants n'envoient que le nom de domaine, jamais l'adresse complète de la page
+  referrer: 'strict-origin-when-cross-origin',
+  authors: [{ name: 'Rahim Tamhaev' }],
   title: 'Rahim Tamhaev, développeur et vidéaste',
   description:
     'Portfolio de Rahim Tamhaev, étudiant BUT MMI : développement web, mobile et desktop, création audiovisuelle et photographie.',
   openGraph: {
     type: 'website',
+    url: '/',
+    siteName: 'Rahim Tamhaev',
+    locale: 'fr_FR',
     title: 'Rahim Tamhaev, développeur et vidéaste',
     description: 'Développement web, mobile et desktop, création audiovisuelle et photographie.',
   },

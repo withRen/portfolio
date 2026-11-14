@@ -1,6 +1,7 @@
 import { ArrowUpRight } from '@phosphor-icons/react/dist/ssr';
-import { contactHref, socials, tools } from '@/data/content';
+import { asset, contactHref, socials, tools } from '@/data/content';
 import Logo from './Logo';
+import PrivacySettings from './PrivacySettings';
 import Reveal from './Reveal';
 
 export default function ContactSection() {
@@ -45,6 +46,16 @@ export default function ContactSection() {
           <Logo className="size-6 text-zinc-300" title="" />
           &copy; 2026 Rahim Tamhaev
         </span>
+        <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-zinc-400">
+          <li>
+            <a href={asset('/mentions-legales/')} className="transition-colors duration-300 hover:text-accent">
+              Mentions légales
+            </a>
+          </li>
+          <li>
+            <PrivacySettings className="transition-colors duration-300 hover:text-accent" />
+          </li>
+        </ul>
         <ul className="flex gap-6 text-sm text-zinc-400">
           {socials.map((s) => (
             <li key={s.label}>

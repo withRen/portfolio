@@ -59,8 +59,9 @@ export const photos: Photo[] = [
   photo('IMG_20250118_173443', 'Janvier 2025', 1333),
 ];
 
-export const ytThumb = (id: string, size: 'maxresdefault' | 'hqdefault' = 'maxresdefault') =>
-  `https://img.youtube.com/vi/${id}/${size}.jpg`;
+// Miniatures copiées dans public/films (scripts/fetch-thumbs.sh) : aucune requête vers
+// les serveurs de Google tant que le visiteur n'a pas choisi de lire une vidéo (RGPD).
+export const ytThumb = (id: string) => asset(`/films/${id}.jpg`);
 
 const video = (id: string, title: string, type: string): Video => ({
   id,
@@ -155,13 +156,6 @@ export const featured: Featured[] = [
 
 export const otherProjects: Project[] = [
   {
-    id: 'nightly',
-    title: 'Nightly',
-    desc: 'Application macOS pour améliorer la qualité du sommeil, avec suivi intelligent et recommandations personnalisées.',
-    stack: ['Swift', 'macOS', 'Open source'],
-    href: 'https://github.com/Armfy/Nightly',
-  },
-  {
     id: 'legoshop',
     title: 'LegoShop',
     desc: 'Plateforme e-commerce complète : wishlist, catalogue de sets, notation et messagerie entre passionnés. Projet académique SAE 203.',
@@ -173,14 +167,14 @@ export const otherProjects: Project[] = [
     title: 'Aim Trainer Pro',
     desc: "Logiciel desktop d'entraînement à la visée, avec statistiques et graphiques de précision.",
     stack: ['Electron', 'TypeScript'],
-    href: 'https://github.com/Armfy/aim-trainer-pro',
+    href: 'https://github.com/withRen/aim-trainer-pro',
   },
   {
     id: 'zwyx',
     title: 'Zwyx',
     desc: "Compagnon de productivité pour l'écosystème Apple : tâches, notes et rappels dans une interface native.",
     stack: ['Swift', 'SwiftUI', 'macOS', 'iOS'],
-    href: 'https://github.com/Armfy/Zwyx',
+    href: 'https://github.com/withRen/Zwyx',
   },
   {
     id: 'horizon',
@@ -202,7 +196,7 @@ export const tools: { group: string; items: string[] }[] = [
 ];
 
 export const socials = [
-  { label: 'GitHub', href: 'https://github.com/Armfy' },
+  { label: 'GitHub', href: 'https://github.com/withRen' },
   { label: 'LinkedIn', href: 'https://www.linkedin.com/in/rahim-tamhaev' },
   { label: 'Instagram', href: 'https://www.instagram.com/rahimwith/' },
 ];

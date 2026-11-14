@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { ArrowUpRight, Play, SpeakerHigh, SpeakerSlash } from '@phosphor-icons/react';
 import { videos, ytThumb, type Video } from '@/data/content';
+import { allowsYouTube, setYouTubeConsent, useYouTubeConsent } from '@/lib/consent';
 import VideoPlayer from './VideoPlayer';
 
 /*
@@ -21,15 +22,13 @@ const glassBtn =
   'inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2.5 text-sm font-medium text-zinc-50 backdrop-blur-md transition-colors duration-300 hover:bg-white/20 active:scale-[0.98]';
 
 function Thumb({ v, className = '' }: { v: Video; className?: string }) {
-  const [src, setSrc] = useState(ytThumb(v.id));
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={src}
+      src={ytThumb(v.id)}
       alt={`Image tirée de ${v.title}`}
       loading="lazy"
       draggable={false}
-      onError={() => setSrc(ytThumb(v.id, 'hqdefault'))}
       className={`size-full object-cover ${className}`}
     />
   );
@@ -103,8 +102,11 @@ export default function VideoSection() {
   };
 
   const jump = (i: number) => sentinels.current[i]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  const consent = useYouTubeConsent();
   const film = active >= 0 ? videos[active] : null;
-  const showPreview = canPreview && film !== null && !playing;
+  // Les extraits muets viennent de YouTube : uniquement après un accord retenu (pas « une fois »)
+  const showPreview = canPreview && film !== null && !playing && consent === 'granted';
+  const offerPreview = canPreview && film !== null && !playing && !allowsYouTube(consent) && consent !== 'denied';
 
   return (
     <section id="videos" aria-labelledby="videos-title">
@@ -153,6 +155,7 @@ export default function VideoSection() {
                     tabIndex={-1}
                     allow="autoplay; encrypted-media"
                     onLoad={() => setTimeout(() => setReady(true), 900)}
+                    referrerPolicy="strict-origin-when-cross-origin"
                     src={embed(v.id, `autoplay=1&mute=1&controls=0&loop=1&playlist=${v.id}&enablejsapi=1`)}
                     className={`pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 border-0 transition-opacity duration-1000 ${
                       ready ? 'opacity-100' : 'opacity-0'
@@ -205,6 +208,17 @@ export default function VideoSection() {
                 className="absolute right-6 top-6 z-30 inline-flex size-11 items-center justify-center rounded-full border border-white/20 bg-zinc-950/30 text-zinc-50 backdrop-blur-md transition-colors duration-300 hover:bg-white/20 md:right-10 md:top-10"
               >
                 {muted ? <SpeakerSlash size={18} weight="regular" /> : <SpeakerHigh size={18} weight="regular" />}
+              </button>
+            )}
+
+            {offerPreview && (
+              <button
+                type="button"
+                onClick={() => setYouTubeConsent('granted')}
+                className="absolute right-6 top-6 z-30 hidden items-center gap-2 rounded-full border border-white/20 bg-zinc-950/30 px-4 py-2.5 text-xs font-medium text-zinc-50 backdrop-blur-md transition-colors duration-300 hover:bg-white/20 md:inline-flex md:right-10 md:top-10"
+              >
+                <Play size={12} weight="fill" aria-hidden />
+                Activer les extraits (YouTube)
               </button>
             )}
 
