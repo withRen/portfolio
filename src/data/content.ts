@@ -246,13 +246,6 @@ const videoSrc: { id: string; title: T; type: T; uploaded: string; duration: str
     duration: 'PT1M19S',
   },
   {
-    id: 'aPt2vD_mj0k',
-    title: { fr: 'Publicité sur la musique', en: 'Music commercial', ru: 'Реклама о музыке' },
-    type: { fr: 'Court-métrage publicitaire', en: 'Short promotional film', ru: 'Рекламный короткий метр' },
-    uploaded: '2025-05-31',
-    duration: 'PT1M',
-  },
-  {
     id: 'OSng25-tAkc',
     title: { fr: 'Europe en 2100', en: 'Europe in 2100', ru: 'Европа в 2100 году' },
     type: { fr: 'Documentaire fictif', en: 'Mockumentary', ru: 'Псевдодокументальный фильм' },
