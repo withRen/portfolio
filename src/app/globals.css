@@ -9,6 +9,11 @@
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Barlow Condensed n'a pas de cyrillique : en russe, les titres passent en Oswald (lib/fonts.ts) */
+html:lang(ru) .font-display {
+  font-family: var(--font-oswald), var(--font-barlow), 'Arial Narrow', sans-serif;
+}
+
 html {
   scroll-snap-type: y proximity;
   background: var(--color-zinc-950);

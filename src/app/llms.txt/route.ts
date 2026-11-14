@@ -1,5 +1,9 @@
-import { featured, socials, tools, videos } from '@/data/content';
-import { DESCRIPTION, NAME, SITE } from '@/lib/seo';
+import { getContent, socials } from '@/data/content';
+import { dictionaries } from '@/i18n/dictionaries';
+import { NAME, SITE } from '@/lib/seo';
+
+const { featured, tools, videos } = getContent('fr');
+const DESCRIPTION = dictionaries.fr.meta.description;
 
 /*
  * /llms.txt : résumé du portfolio en Markdown pour les moteurs de réponse (ChatGPT,
@@ -34,6 +38,11 @@ export function GET() {
     '## Contact et profils',
     '',
     ...socials.map((s) => `- [${s.label}](${s.href})`),
+    '',
+    '## Autres langues',
+    '',
+    `- [English version](${SITE}/en/) : the full portfolio in English.`,
+    `- [Версия на русском](${SITE}/ru/) : полное портфолио на русском языке.`,
     '',
     '## Optional',
     '',

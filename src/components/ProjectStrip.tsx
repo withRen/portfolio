@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { ArrowUpRight, CaretLeft, CaretRight } from '@phosphor-icons/react';
-import { featured, type Featured } from '@/data/content';
+import type { Featured } from '@/data/content';
+import { useI18n } from '@/i18n/context';
 
 /*
  * Projets dev, présentés directement en grand : un projet à la fois, grande image et
@@ -20,11 +21,12 @@ const LEAVE_MS = 1000;
 type Shown = { i: number; dir: 1 | -1; from: number | null };
 
 function Cover({ p, className, style, decorative }: { p: Featured; className: string; style?: CSSProperties; decorative?: boolean }) {
+  const { t } = useI18n();
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src={p.cover}
-      alt={decorative ? '' : `Aperçu de ${p.title}`}
+      alt={decorative ? '' : t.dev.preview(p.title)}
       style={{ objectPosition: p.focus, aspectRatio: p.ratio ?? 16 / 10, ...style }}
       className={`max-h-full w-full max-w-[72rem] self-center justify-self-center rounded-[1.25rem] object-cover ring-1 ring-white/10 [grid-area:1/1] md:w-auto ${className}`}
     />
@@ -32,6 +34,8 @@ function Cover({ p, className, style, decorative }: { p: Featured; className: st
 }
 
 export default function ProjectStrip() {
+  const { t, content } = useI18n();
+  const featured = content.featured;
   const n = featured.length;
   const [shown, setShown] = useState<Shown>({ i: 0, dir: 1, from: null });
   const section = useRef<HTMLDivElement>(null);
@@ -91,11 +95,11 @@ export default function ProjectStrip() {
       <div
         className="sticky top-0 flex h-[100dvh] flex-col overflow-hidden"
         role="region"
-        aria-roledescription="carrousel"
-        aria-label="Projets de développement"
+        aria-roledescription={t.dev.carousel}
+        aria-label={t.dev.region}
       >
         {/* Règle : un trait par projet, cliquable */}
-        <nav aria-label="Choisir un projet" className="flex justify-center pt-6 md:pt-8">
+        <nav aria-label={t.dev.choose} className="flex justify-center pt-6 md:pt-8">
           <ul className="flex items-end gap-1">
             {featured.map((f, i) => (
               <li key={f.id}>
@@ -122,7 +126,7 @@ export default function ProjectStrip() {
           <button
             type="button"
             onClick={() => go(active - 1)}
-            aria-label={`Projet précédent : ${prev.title}`}
+            aria-label={t.dev.prevNamed(prev.title)}
             className="group absolute left-0 top-1/2 z-20 hidden h-[56%] w-[5vw] -translate-y-1/2 overflow-hidden rounded-r-xl md:block"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -132,7 +136,7 @@ export default function ProjectStrip() {
           <button
             type="button"
             onClick={() => go(active + 1)}
-            aria-label={`Projet suivant : ${next.title}`}
+            aria-label={t.dev.nextNamed(next.title)}
             className="group absolute right-0 top-1/2 z-20 hidden h-[56%] w-[5vw] -translate-y-1/2 overflow-hidden rounded-l-xl md:block"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -171,7 +175,7 @@ export default function ProjectStrip() {
             {p.desc}
           </p>
           <div className="pv-line flex flex-col gap-3 md:col-span-3 md:items-end" style={line(4)}>
-            <ul aria-label="Technologies" className="flex flex-wrap gap-1.5 md:justify-end">
+            <ul aria-label={t.dev.tech} className="flex flex-wrap gap-1.5 md:justify-end">
               {p.stack.map((t) => (
                 <li key={t} className="rounded-full border border-white/12 bg-white/5 px-2.5 py-1 font-mono text-[11px] text-zinc-300">
                   {t}
@@ -197,7 +201,7 @@ export default function ProjectStrip() {
                 <button
                   type="button"
                   onClick={() => go(active - 1)}
-                  aria-label="Projet précédent"
+                  aria-label={t.dev.prev}
                   className="inline-flex size-10 items-center justify-center rounded-full border border-white/15 text-zinc-100"
                 >
                   <CaretLeft size={16} aria-hidden />
@@ -205,7 +209,7 @@ export default function ProjectStrip() {
                 <button
                   type="button"
                   onClick={() => go(active + 1)}
-                  aria-label="Projet suivant"
+                  aria-label={t.dev.next}
                   className="inline-flex size-10 items-center justify-center rounded-full border border-white/15 text-zinc-100"
                 >
                   <CaretRight size={16} aria-hidden />

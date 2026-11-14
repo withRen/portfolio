@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { CaretLeft, CaretRight, X } from '@phosphor-icons/react';
 import type { Photo } from '@/data/content';
+import { useI18n } from '@/i18n/context';
 
 type Props = {
   photos: Photo[];
@@ -15,6 +16,7 @@ const btn =
   'inline-flex size-11 items-center justify-center rounded-full border border-white/15 bg-white/5 text-zinc-100 backdrop-blur-md transition-colors duration-300 hover:bg-zinc-100 hover:text-zinc-950 active:scale-[0.96]';
 
 export default function Lightbox({ photos, index, onIndex, onClose }: Props) {
+  const { t } = useI18n();
   const dialog = useRef<HTMLDialogElement>(null);
   const opener = useRef<HTMLElement | null>(null);
   const isOpen = index !== null;
@@ -38,7 +40,7 @@ export default function Lightbox({ photos, index, onIndex, onClose }: Props) {
   return (
     <dialog
       ref={dialog}
-      aria-label="Photo en plein écran"
+      aria-label={t.photo.viewer}
       onClose={() => {
         onClose();
         opener.current?.focus({ preventScroll: true });
@@ -54,7 +56,7 @@ export default function Lightbox({ photos, index, onIndex, onClose }: Props) {
       className="m-0 h-[100dvh] max-h-none w-screen max-w-none bg-transparent p-0 text-zinc-100 open:grid open:grid-rows-[auto_1fr_auto]"
     >
       <div className="flex justify-end px-5 py-4 md:px-10 md:py-6">
-        <button type="button" aria-label="Fermer" onClick={() => dialog.current?.close()} className={btn}>
+        <button type="button" aria-label={t.photo.close} onClick={() => dialog.current?.close()} className={btn}>
           <X size={18} weight="regular" />
         </button>
       </div>
@@ -71,10 +73,10 @@ export default function Lightbox({ photos, index, onIndex, onClose }: Props) {
       <div className="flex items-center justify-between gap-4 px-5 py-4 md:px-10 md:py-6">
         <span className="text-sm text-zinc-300">{photo?.title}</span>
         <div className="flex gap-2">
-          <button type="button" aria-label="Photo précédente" onClick={() => go(-1)} className={btn}>
+          <button type="button" aria-label={t.photo.prev} onClick={() => go(-1)} className={btn}>
             <CaretLeft size={18} weight="regular" />
           </button>
-          <button type="button" aria-label="Photo suivante" onClick={() => go(1)} className={btn}>
+          <button type="button" aria-label={t.photo.next} onClick={() => go(1)} className={btn}>
             <CaretRight size={18} weight="regular" />
           </button>
         </div>

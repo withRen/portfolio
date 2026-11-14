@@ -1,5 +1,8 @@
 import type { MetadataRoute } from 'next';
-import { DESCRIPTION, NAME, TITLE } from '@/lib/seo';
+import { dictionaries } from '@/i18n/dictionaries';
+import { NAME } from '@/lib/seo';
+
+const { title: TITLE, description: DESCRIPTION } = dictionaries.fr.meta;
 
 export const dynamic = 'force-static';
 

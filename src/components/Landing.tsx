@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from 'react';
 import { asset } from '@/data/content';
+import { useI18n } from '@/i18n/context';
+import LangSwitch from './LangSwitch';
 import Logo from './Logo';
 import WaveCanvas from './WaveCanvas';
 
@@ -19,6 +21,7 @@ const smooth = (t: number) => t * t * (3 - 2 * t);
 const underline = 'border-b border-current pb-0.5 transition-opacity duration-300 hover:opacity-60';
 
 export default function Landing({ onNav }: Props) {
+  const { t, locale } = useI18n();
   const section = useRef<HTMLElement>(null);
   const frame = useRef<HTMLDivElement>(null);
   const img = useRef<HTMLDivElement>(null);
@@ -83,7 +86,7 @@ export default function Landing({ onNav }: Props) {
   const toWork = () => onNav('photos');
 
   return (
-    <section ref={section} id="top" aria-label="Introduction" className="relative h-[300dvh] text-zinc-50">
+    <section ref={section} id="top" aria-label={t.landing.region} className="relative h-[300dvh] text-zinc-50">
       <div aria-hidden className="intro-snap pointer-events-none absolute inset-x-0 h-px" style={{ top: `${((ZOOM_END + EXIT_START) / 2) * 100}dvh` }} />
       <div ref={stage} className="sticky top-0 h-[100dvh] overflow-hidden">
         <div
@@ -101,7 +104,7 @@ export default function Landing({ onNav }: Props) {
             <br className="md:hidden" /> Tamhaev
           </h1>
           <p className="mx-auto mt-4 max-w-[36ch] text-sm leading-relaxed text-zinc-300 md:mt-5 md:text-base">
-            Développeur et vidéaste. Je code des interfaces et je filme des histoires.
+            {t.landing.intro}
           </p>
         </div>
 
@@ -109,7 +112,7 @@ export default function Landing({ onNav }: Props) {
           <button
             type="button"
             onClick={toWork}
-            aria-label="Voir les projets"
+            aria-label={t.landing.seeWork}
             className="block size-full cursor-pointer overflow-hidden"
           >
             <div
@@ -120,7 +123,7 @@ export default function Landing({ onNav }: Props) {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={asset('/photos/dunes.png')}
-                alt="Dunes sombres sous un ciel clair"
+                alt={t.landing.heroAlt}
                 draggable={false}
                 className="absolute inset-0 size-full object-cover"
               />
@@ -135,21 +138,20 @@ export default function Landing({ onNav }: Props) {
             <span className="label hidden leading-snug lg:block">
               Rahim Tamhaev
               <br />
-              Développeur et vidéaste
+              {t.landing.role}
             </span>
           </div>
 
-          <button
-            type="button"
-            onClick={toWork}
-            className={`label pointer-events-auto absolute right-5 top-5 md:right-10 md:top-8 ${underline}`}
-          >
-            Voir les projets
-          </button>
+          <div className="pointer-events-auto absolute right-5 top-5 flex flex-col items-end gap-3 md:right-10 md:top-8 md:flex-row md:items-center md:gap-8">
+            <button type="button" onClick={toWork} className={`label ${underline}`}>
+              {t.landing.seeWork}
+            </button>
+            <LangSwitch locale={locale} page="home" className="label -mr-1 -mt-1.5" />
+          </div>
 
           <div className="pointer-events-auto absolute bottom-6 left-5 flex flex-col items-start gap-3 md:bottom-8 md:left-10">
             <button type="button" onClick={() => onNav('contact')} className={`label ${underline}`}>
-              Me contacter
+              {t.landing.contact}
             </button>
           </div>
 

@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { asset } from '@/data/content';
+import type { Locale } from '@/i18n/config';
+import { I18nProvider } from '@/i18n/context';
 import Backdrop from './Backdrop';
 import ContactSection from './ContactSection';
 import Landing from './Landing';
@@ -15,7 +17,7 @@ import VideoSection from './VideoSection';
 const SECTIONS: DialId[] = ['top', 'photos', 'videos', 'dev', 'contact'];
 const dunes = asset('/photos/dunes.png');
 
-export default function Site() {
+export default function Site({ locale }: { locale: Locale }) {
   const [section, setSection] = useState<DialId>('top');
   const [photo, setPhoto] = useState(dunes);
   const [backdrop, setBackdrop] = useState(dunes);
@@ -49,7 +51,7 @@ export default function Site() {
   }, []);
 
   return (
-    <>
+    <I18nProvider locale={locale}>
       <Loader />
       <Backdrop src={backdrop} />
       <Landing onNav={nav} />
@@ -61,6 +63,6 @@ export default function Site() {
       </main>
       <CameraDial active={section} onSelect={nav} />
       <ScrollDriver />
-    </>
+    </I18nProvider>
   );
 }

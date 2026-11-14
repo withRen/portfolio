@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, Play, X } from '@phosphor-icons/react';
+import { useI18n } from '@/i18n/context';
 import { allowsYouTube, setYouTubeConsent, useYouTubeConsent } from '@/lib/consent';
 
 type Props = { id: string | null; title?: string; onClose: () => void };
@@ -12,16 +13,16 @@ type Props = { id: string | null; title?: string; onClose: () => void };
  * Accepter et refuser demandent le même effort (recommandation CNIL).
  */
 function YouTubeGate({ id, title }: { id: string; title?: string }) {
+  const { t, href } = useI18n();
   const [remember, setRemember] = useState(false);
   return (
     <div className="relative flex size-full flex-col items-center justify-center gap-5 overflow-hidden p-6 text-center md:p-12">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/films/${id}.jpg`} alt="" className="absolute inset-0 -z-10 size-full object-cover opacity-30 blur-sm" />
       <p className="max-w-[46ch] text-sm leading-relaxed text-zinc-200 md:text-base">
-        Cette vidéo est hébergée par YouTube (Google). La lire ici charge leurs services, qui peuvent déposer des
-        cookies et collecter des données de navigation.{' '}
-        <a href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/confidentialite/`} className="underline underline-offset-4 hover:text-zinc-50">
-          En savoir plus
+        {t.gate.text}{' '}
+        <a href={href('privacy')} className="underline underline-offset-4 hover:text-zinc-50">
+          {t.gate.more}
         </a>
       </p>
       <div className="flex flex-wrap justify-center gap-2">
@@ -31,7 +32,7 @@ function YouTubeGate({ id, title }: { id: string; title?: string }) {
           className="inline-flex items-center gap-2 rounded-full bg-zinc-50 px-6 py-2.5 text-sm font-medium text-zinc-950 transition-transform duration-300 hover:-translate-y-0.5 active:scale-[0.98]"
         >
           <Play size={16} weight="fill" aria-hidden />
-          Lire ici
+          {t.gate.playHere}
         </button>
         <a
           href={`https://youtu.be/${id}`}
@@ -39,13 +40,13 @@ function YouTubeGate({ id, title }: { id: string; title?: string }) {
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 py-2.5 text-sm font-medium text-zinc-50 backdrop-blur-md transition-colors duration-300 hover:bg-white/20"
         >
-          Ouvrir sur YouTube
+          {t.gate.openYouTube}
           <ArrowUpRight size={14} aria-hidden />
         </a>
       </div>
       <label className="flex items-center gap-2 text-sm text-zinc-300">
         <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className="size-4 accent-zinc-50" />
-        Retenir mon choix pour les autres vidéos
+        {t.gate.remember}
       </label>
       <span className="sr-only">{title}</span>
     </div>
@@ -54,6 +55,7 @@ function YouTubeGate({ id, title }: { id: string; title?: string }) {
 
 /** Full-screen player in a native dialog: plays with sound, stops when closed. */
 export default function VideoPlayer({ id, title, onClose }: Props) {
+  const { t } = useI18n();
   const consent = useYouTubeConsent();
   const dialog = useRef<HTMLDialogElement>(null);
   const opener = useRef<HTMLElement | null>(null);
@@ -72,7 +74,7 @@ export default function VideoPlayer({ id, title, onClose }: Props) {
   return (
     <dialog
       ref={dialog}
-      aria-label={title ? `Lecture de ${title}` : 'Lecteur vidéo'}
+      aria-label={title ? t.video.player(title) : t.video.playerFallback}
       onClose={() => {
         document.body.style.overflow = '';
         onClose();
@@ -88,7 +90,7 @@ export default function VideoPlayer({ id, title, onClose }: Props) {
         <span className="truncate text-sm text-zinc-300">{title}</span>
         <button
           type="button"
-          aria-label="Fermer le lecteur"
+          aria-label={t.video.closePlayer}
           onClick={() => dialog.current?.close()}
           className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/5 text-zinc-100 backdrop-blur-md transition-colors duration-300 hover:bg-zinc-100 hover:text-zinc-950 active:scale-[0.96]"
         >
@@ -100,7 +102,7 @@ export default function VideoPlayer({ id, title, onClose }: Props) {
           <div className="row-in aspect-video max-h-full w-full max-w-[min(100%,calc((100dvh-8rem)*16/9))] overflow-hidden rounded-[1.75rem] bg-zinc-900 shadow-[0_40px_100px_-30px_rgb(0_0_0/0.9)] ring-1 ring-white/10 md:rounded-[2.25rem]">
             {allowsYouTube(consent) ? (
               <iframe
-                title={title ?? 'Vidéo'}
+                title={title ?? t.video.iframe}
                 allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
                 allowFullScreen
                 referrerPolicy="strict-origin-when-cross-origin"

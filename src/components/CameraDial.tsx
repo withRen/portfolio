@@ -1,16 +1,11 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useI18n } from '@/i18n/context';
 
 export type DialId = 'top' | 'photos' | 'videos' | 'dev' | 'contact';
 
-const items: { id: DialId; label: string }[] = [
-  { id: 'top', label: 'Intro' },
-  { id: 'photos', label: 'Photo' },
-  { id: 'videos', label: 'Vidéo' },
-  { id: 'dev', label: 'Dev' },
-  { id: 'contact', label: 'Contact' },
-];
+const items: { id: DialId }[] = [{ id: 'top' }, { id: 'photos' }, { id: 'videos' }, { id: 'dev' }, { id: 'contact' }];
 
 const STEP = 26; // degrees between two sections on the wheel
 const W = 460; // wheel width (px); it scales down on narrow screens
@@ -72,6 +67,7 @@ type Props = { active: DialId; onSelect: (id: DialId) => void };
  * labels that turns with the page. Sliding the wheel scrubs through the page.
  */
 export default function CameraDial({ active, onSelect }: Props) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [visible, setVisible] = useState(false);
   const [readout, setReadout] = useState(0);
@@ -194,7 +190,7 @@ export default function CameraDial({ active, onSelect }: Props) {
 
   return (
     <nav
-      aria-label="Sections"
+      aria-label={t.dial.nav}
       aria-hidden={!visible || undefined}
       inert={!visible || undefined}
       className={`pointer-events-none fixed inset-x-0 bottom-3 z-40 flex flex-col items-center transition-[opacity,transform] duration-500 ease-out-expo md:bottom-5 ${
@@ -249,7 +245,7 @@ export default function CameraDial({ active, onSelect }: Props) {
             }}
             className={`label absolute left-0 top-0 whitespace-nowrap ${i === readout ? 'text-accent' : 'text-zinc-200'}`}
           >
-            {it.label}
+            {t.dial[it.id]}
           </span>
         ))}
       </div>
@@ -278,14 +274,14 @@ export default function CameraDial({ active, onSelect }: Props) {
                 onSelect(it.id);
               }}
               aria-current={isActive ? 'true' : undefined}
-              aria-label={it.label}
+              aria-label={t.dial[it.id]}
               className={`flex h-9 items-center justify-center rounded-full font-medium transition-[width,background-color,color] duration-500 ease-out-expo ${
                 isActive
                   ? 'w-[4.75rem] bg-white/10 text-[13px] text-accent'
                   : 'w-9 text-[11px] text-zinc-400 hover:bg-white/5 hover:text-zinc-100'
               }`}
             >
-              {isActive ? it.label : <span className="size-1.5 rounded-full bg-current" />}
+              {isActive ? t.dial[it.id] : <span className="size-1.5 rounded-full bg-current" />}
             </button>
           );
         })}

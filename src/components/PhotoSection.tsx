@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { photos, type Photo } from '@/data/content';
+import { useMemo, useState } from 'react';
+import type { Photo } from '@/data/content';
+import { useI18n } from '@/i18n/context';
 import Lightbox from './Lightbox';
 
 type Props = { onActiveImage: (src: string) => void };
@@ -13,10 +14,15 @@ type Props = { onActiveImage: (src: string) => void };
  * reduced motion it falls back to a static grid in the normal flow.
  */
 const COLS = 4;
-const columns: { photo: Photo; index: number }[][] = Array.from({ length: COLS }, () => []);
-photos.forEach((photo, index) => columns[index % COLS].push({ photo, index }));
 
 export default function PhotoSection({ onActiveImage }: Props) {
+  const { t, content } = useI18n();
+  const photos = content.photos;
+  const columns = useMemo(() => {
+    const cols: { photo: Photo; index: number }[][] = Array.from({ length: COLS }, () => []);
+    photos.forEach((photo, index) => cols[index % COLS].push({ photo, index }));
+    return cols;
+  }, [photos]);
   const [lightbox, setLightbox] = useState<number | null>(null);
 
   return (
@@ -38,7 +44,7 @@ export default function PhotoSection({ onActiveImage }: Props) {
                   onClick={() => setLightbox(index)}
                   onMouseEnter={() => onActiveImage(photo.image)}
                   onFocus={() => onActiveImage(photo.image)}
-                  aria-label={`${photo.title}, agrandir`}
+                  aria-label={t.photo.enlarge(photo.title)}
                   className={`pg-tile group block w-full cursor-zoom-in overflow-hidden rounded-[1.25rem] bg-zinc-900 ring-1 ring-white/10 transition-[opacity,transform] duration-500 ease-out-expo active:scale-[0.98] ${
                     c < 2 && k >= col.length ? 'md:hidden' : ''
                   }`}
@@ -67,10 +73,10 @@ export default function PhotoSection({ onActiveImage }: Props) {
             id="photos-title"
             className="pg-title font-display text-[22vw] font-bold uppercase leading-[0.8] tracking-tight md:text-[15vw]"
           >
-            Photo
+            {t.photo.title}
           </h2>
           <p className="mt-4 max-w-[30ch] text-sm md:mt-6 md:text-base">
-            Architectures, détails urbains et scènes naturelles.
+            {t.photo.lead}
           </p>
         </div>
       </div>

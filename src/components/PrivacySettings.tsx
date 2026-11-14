@@ -2,7 +2,7 @@
 
 import { useRef } from 'react';
 import { X } from '@phosphor-icons/react';
-import { asset } from '@/data/content';
+import { useI18n } from '@/i18n/context';
 import { allowsYouTube, setYouTubeConsent, useYouTubeConsent } from '@/lib/consent';
 
 /*
@@ -10,6 +10,7 @@ import { allowsYouTube, setYouTubeConsent, useYouTubeConsent } from '@/lib/conse
  * (YouTube). Le visiteur peut retirer son accord aussi facilement qu'il l'a donné.
  */
 export default function PrivacySettings({ className = '' }: { className?: string }) {
+  const { t, href } = useI18n();
   const dialog = useRef<HTMLDialogElement>(null);
   const consent = useYouTubeConsent();
   const on = allowsYouTube(consent);
@@ -17,7 +18,7 @@ export default function PrivacySettings({ className = '' }: { className?: string
   return (
     <>
       <button type="button" onClick={() => dialog.current?.showModal()} className={className}>
-        Cookies et confidentialité
+        {t.privacy.button}
       </button>
       <dialog
         ref={dialog}
@@ -28,11 +29,11 @@ export default function PrivacySettings({ className = '' }: { className?: string
         <div className="flex flex-col gap-6 p-6 md:p-8">
           <div className="flex items-start justify-between gap-4">
             <h2 id="privacy-title" className="text-xl font-semibold tracking-tight">
-              Cookies et confidentialité
+              {t.privacy.button}
             </h2>
             <button
               type="button"
-              aria-label="Fermer"
+              aria-label={t.privacy.close}
               onClick={() => dialog.current?.close()}
               className="inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-white/15 text-zinc-300 transition-colors hover:bg-white/10 hover:text-zinc-50"
             >
@@ -41,18 +42,16 @@ export default function PrivacySettings({ className = '' }: { className?: string
           </div>
 
           <p className="text-sm leading-relaxed text-zinc-300">
-            Ce site ne dépose aucun cookie, ne mesure pas l’audience et n’affiche aucune publicité. Le seul service
-            externe optionnel est le lecteur YouTube des vidéos.
+            {t.privacy.intro}
           </p>
 
           <div className="flex items-start justify-between gap-6 rounded-2xl border border-white/10 p-4">
             <div>
               <p id="yt-label" className="font-medium">
-                Vidéos YouTube
+                {t.privacy.ytLabel}
               </p>
               <p id="yt-desc" className="mt-1 text-sm leading-relaxed text-zinc-400">
-                Lecture des films et extraits sur cette page. Google peut alors déposer des cookies et collecter des
-                données de navigation.
+                {t.privacy.ytDesc}
               </p>
             </div>
             <button
@@ -76,9 +75,9 @@ export default function PrivacySettings({ className = '' }: { className?: string
           </div>
 
           <p className="text-sm text-zinc-400">
-            Votre choix est enregistré dans ce navigateur pendant 6 mois au plus.{' '}
-            <a href={asset('/confidentialite/')} className="text-zinc-200 underline underline-offset-4 hover:text-zinc-50">
-              Politique de confidentialité
+            {t.privacy.stored}{' '}
+            <a href={href('privacy')} className="text-zinc-200 underline underline-offset-4 hover:text-zinc-50">
+              {t.privacy.policy}
             </a>
           </p>
         </div>

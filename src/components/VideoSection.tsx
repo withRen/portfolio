@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { ArrowUpRight, Play, SpeakerHigh, SpeakerSlash } from '@phosphor-icons/react';
-import { videos, ytThumb, type Video } from '@/data/content';
+import { ytThumb, type Video } from '@/data/content';
+import { useI18n } from '@/i18n/context';
 import { allowsYouTube, setYouTubeConsent, useYouTubeConsent } from '@/lib/consent';
 import VideoPlayer from './VideoPlayer';
 
@@ -22,11 +23,12 @@ const glassBtn =
   'inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2.5 text-sm font-medium text-zinc-50 backdrop-blur-md transition-colors duration-300 hover:bg-white/20 active:scale-[0.98]';
 
 function Thumb({ v, className = '' }: { v: Video; className?: string }) {
+  const { t } = useI18n();
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src={ytThumb(v.id)}
-      alt={`Image tirée de ${v.title}`}
+      alt={t.video.thumbAlt(v.title)}
       loading="lazy"
       draggable={false}
       className={`size-full object-cover ${className}`}
@@ -35,6 +37,8 @@ function Thumb({ v, className = '' }: { v: Video; className?: string }) {
 }
 
 export default function VideoSection() {
+  const { t, content } = useI18n();
+  const videos = content.videos;
   const n = videos.length;
   const [active, setActive] = useState(-1);
   const [canPreview, setCanPreview] = useState(false);
@@ -132,7 +136,7 @@ export default function VideoSection() {
             id="videos-title"
             className="vd-giant font-display font-bold uppercase leading-none tracking-tight text-zinc-50"
           >
-            Vidéo
+            {t.video.title}
           </h2>
 
           <div ref={screen} className="vd-screen overflow-hidden bg-zinc-900 ring-1 ring-white/10">
@@ -188,7 +192,7 @@ export default function VideoSection() {
                         className="inline-flex items-center gap-2 rounded-full bg-zinc-50 px-6 py-2.5 text-sm font-medium text-zinc-950 transition-transform duration-300 hover:-translate-y-0.5 active:scale-[0.98]"
                       >
                         <Play size={16} weight="fill" />
-                        Lecture
+                        {t.video.play}
                       </button>
                       <a href={v.href} target="_blank" rel="noopener noreferrer" className={glassBtn}>
                         YouTube
@@ -204,7 +208,7 @@ export default function VideoSection() {
               <button
                 type="button"
                 onClick={toggleSound}
-                aria-label={muted ? 'Activer le son de l’extrait' : 'Couper le son de l’extrait'}
+                aria-label={muted ? t.video.soundOn : t.video.soundOff}
                 className="absolute right-6 top-6 z-30 inline-flex size-11 items-center justify-center rounded-full border border-white/20 bg-zinc-950/30 text-zinc-50 backdrop-blur-md transition-colors duration-300 hover:bg-white/20 md:right-10 md:top-10"
               >
                 {muted ? <SpeakerSlash size={18} weight="regular" /> : <SpeakerHigh size={18} weight="regular" />}
@@ -218,13 +222,13 @@ export default function VideoSection() {
                 className="absolute right-6 top-6 z-30 hidden items-center gap-2 rounded-full border border-white/20 bg-zinc-950/30 px-4 py-2.5 text-xs font-medium text-zinc-50 backdrop-blur-md transition-colors duration-300 hover:bg-white/20 md:inline-flex md:right-10 md:top-10"
               >
                 <Play size={12} weight="fill" aria-hidden />
-                Activer les extraits (YouTube)
+                {t.video.enablePreviews}
               </button>
             )}
 
             {/* Film strip: jump to any film */}
             <ul
-              aria-label="Films"
+              aria-label={t.video.films}
               className="vd-strip absolute bottom-8 left-12 hidden gap-2 md:flex"
             >
               {videos.map((v, i) => (
@@ -232,7 +236,7 @@ export default function VideoSection() {
                   <button
                     type="button"
                     onClick={() => jump(i)}
-                    aria-label={`Aller à ${v.title}`}
+                    aria-label={t.video.goTo(v.title)}
                     aria-current={i === active ? 'true' : undefined}
                     className={`relative block aspect-video w-14 overflow-hidden rounded-lg ring-1 transition-[opacity,box-shadow] duration-500 ease-out-expo hover:opacity-100 md:w-20 ${
                       i === active ? 'opacity-100 ring-2 ring-zinc-50' : 'opacity-50 ring-white/20'
@@ -249,7 +253,7 @@ export default function VideoSection() {
 
       {/* Static fallback */}
       <div className="vd-static mx-auto max-w-[1400px] px-5 py-24 md:px-10 md:py-32">
-        <h2 className="text-4xl font-semibold leading-none tracking-tighter text-zinc-50 md:text-6xl">Vidéo</h2>
+        <h2 className="text-4xl font-semibold leading-none tracking-tighter text-zinc-50 md:text-6xl">{t.video.title}</h2>
         <ul className="mt-12 grid grid-cols-1 gap-x-6 gap-y-10 md:grid-cols-2">
           {videos.map((v) => (
             <li key={v.id}>

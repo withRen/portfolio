@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useI18n } from '@/i18n/context';
 import Logo from './Logo';
 
 /*
@@ -29,6 +30,7 @@ function dunePath(width: number, periods: number) {
 const LINE = dunePath(W * 2, 4);
 
 export default function Loader() {
+  const { t } = useI18n();
   const [state, setState] = useState<'loading' | 'leaving' | 'gone'>('loading');
 
   useEffect(() => {
@@ -59,7 +61,7 @@ export default function Loader() {
     <div
       role="status"
       aria-live="polite"
-      aria-label="Chargement du site"
+      aria-label={t.loader}
       className={`site-loader fixed inset-0 z-[200] grid place-items-center bg-zinc-950 ${
         state === 'leaving' ? 'site-loader-out' : ''
       }`}
