@@ -258,8 +258,11 @@ const SWIPE_DISTANCE = 0.25;
 const SWIPE_SPEED = 0.5;
 const FLY_MS = 340;
 const BEHIND = { transform: 'translateY(16px) scale(0.93)', filter: 'brightness(0.45)' };
+/** Un swipe doit être franchement horizontal : sinon c'est un scroll de la page */
+const AXIS_MIN = 14;
+const AXIS_RATIO = 2;
 
-type Drag = { id: number; x: number; y: number; t: number; axis: 'x' | 'y' | null; dx: number };
+type Drag = { id: number; x: number; y: number; t: number; axis: 'x' | null; dx: number; scrollY: number };
 
 function DeckCard({
   p,
@@ -333,12 +336,13 @@ function MobileDeck() {
   const featured = content.featured;
   const n = featured.length;
   const [active, setActive] = useState(0);
-  const [peekDir, setPeekDir] = useState<1 | -1>(1);
   const [swiped, setSwiped] = useState(false);
   const [settling, setSettling] = useState(false);
   const deck = useRef<HTMLDivElement>(null);
   const top = useRef<HTMLElement>(null);
-  const under = useRef<HTMLElement>(null);
+  // Les deux cartes du dessous (suivante et précédente) restent montées : rien n'est recréé pendant le geste
+  const underNext = useRef<HTMLElement>(null);
+  const underPrev = useRef<HTMLElement>(null);
   const drag = useRef<Drag | null>(null);
   const flying = useRef(false);
 
@@ -349,12 +353,16 @@ function MobileDeck() {
     const k = Math.min(1, Math.abs(dx) / (width() * 0.5));
     const ease = animate ? `${FLY_MS}ms cubic-bezier(0.2, 0.8, 0.2, 1)` : '0s';
     const c = top.current;
-    const b = under.current;
+    // La carte révélée dépend du sens : vers la gauche on découvre la suivante
+    const b = dx > 0 ? underPrev.current : underNext.current;
+    const other = dx > 0 ? underNext.current : underPrev.current;
+    if (other) other.style.opacity = '0';
     if (c) {
       c.style.transition = `transform ${ease}, opacity ${ease}`;
       c.style.transform = dx ? `translateX(${dx}px) rotate(${dx / 24}deg)` : '';
     }
     if (b) {
+      b.style.opacity = '1';
       b.style.transition = `transform ${ease}, filter ${ease}`;
       b.style.transform = `translateY(${16 * (1 - k)}px) scale(${0.93 + 0.07 * k})`;
       b.style.filter = `brightness(${0.45 + 0.55 * k})`;
@@ -372,18 +380,14 @@ function MobileDeck() {
     };
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return commit();
     flying.current = true;
-    setPeekDir(dir);
-    // Laisse React poser la bonne carte dessous avant de lancer le mouvement
-    setTimeout(() => {
-      paint(-dir * width() * 1.3, true);
-      if (top.current) top.current.style.opacity = '0';
-      setTimeout(commit, FLY_MS - 20);
-    }, 16);
+    paint(-dir * width() * 1.3, true);
+    if (top.current) top.current.style.opacity = '0';
+    setTimeout(commit, FLY_MS - 20);
   };
 
   const onPointerDown = (e: React.PointerEvent) => {
     if (flying.current || (e.target as HTMLElement).closest('a, button')) return;
-    drag.current = { id: e.pointerId, x: e.clientX, y: e.clientY, t: performance.now(), axis: null, dx: 0 };
+    drag.current = { id: e.pointerId, x: e.clientX, y: e.clientY, t: performance.now(), axis: null, dx: 0, scrollY: window.scrollY };
   };
 
   const onPointerMove = (e: React.PointerEvent) => {
@@ -392,43 +396,52 @@ function MobileDeck() {
     const dx = e.clientX - d.x;
     const dy = e.clientY - d.y;
     if (!d.axis) {
-      if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy) * 1.2) {
-        d.axis = 'x';
-        deck.current?.setPointerCapture(e.pointerId);
-      } else if (Math.abs(dy) > 10) {
-        drag.current = null; // geste vertical : la page défile normalement
+      // La page a défilé, ou le geste est plutôt vertical : on laisse le navigateur scroller
+      if (Math.abs(window.scrollY - d.scrollY) > 2 || Math.abs(dy) > 10) {
+        drag.current = null;
         return;
-      } else return;
+      }
+      if (Math.abs(dx) < AXIS_MIN || Math.abs(dx) < Math.abs(dy) * AXIS_RATIO) return;
+      d.axis = 'x';
+      deck.current?.setPointerCapture(e.pointerId);
     }
     d.dx = dx;
-    const dir = dx < 0 ? 1 : -1;
-    if (dir !== peekDir) setPeekDir(dir);
     paint(dx, false);
+  };
+
+  // Le navigateur a repris la main (scroll) : la carte revient en place, jamais de lancer
+  const onPointerCancel = (e: React.PointerEvent) => {
+    const d = drag.current;
+    drag.current = null;
+    if (d && d.id === e.pointerId && d.axis === 'x') paint(0, true);
   };
 
   const onPointerUp = (e: React.PointerEvent) => {
     const d = drag.current;
     drag.current = null;
     if (!d || d.id !== e.pointerId || d.axis !== 'x') return;
+    if (Math.abs(window.scrollY - d.scrollY) > 2) return paint(0, true);
     const speed = Math.abs(d.dx) / Math.max(1, performance.now() - d.t);
     if (Math.abs(d.dx) > width() * SWIPE_DISTANCE || (speed > SWIPE_SPEED && Math.abs(d.dx) > 40)) fly(d.dx < 0 ? 1 : -1);
     else paint(0, true); // pas assez loin : la carte revient en place
   };
 
   const p = featured[active];
-  const peekIndex = (active + peekDir + n) % n;
+  const nextIndex = (active + 1) % n;
+  const prevIndex = (active - 1 + n) % n;
 
   return (
-    <div className="flex h-[100svh] flex-col px-3 pb-[5.5rem] pt-3" role="region" aria-roledescription={t.dev.carousel} aria-label={t.dev.region}>
+    <div className="flex h-[100svh] flex-col px-3 pb-[5.5rem] pt-3 [overflow-anchor:none]" role="region" aria-roledescription={t.dev.carousel} aria-label={t.dev.region}>
       <div
         ref={deck}
         className="relative min-h-0 flex-1 touch-pan-y"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
+        onPointerCancel={onPointerCancel}
       >
-        <DeckCard key={`under-${featured[peekIndex].id}`} ref={under} p={featured[peekIndex]} index={peekIndex} n={n} back style={BEHIND} />
+        <DeckCard key={`prev-${featured[prevIndex].id}`} ref={underPrev} p={featured[prevIndex]} index={prevIndex} n={n} back style={{ ...BEHIND, opacity: 0 }} />
+        <DeckCard key={`next-${featured[nextIndex].id}`} ref={underNext} p={featured[nextIndex]} index={nextIndex} n={n} back style={BEHIND} />
         <DeckCard
           key={p.id}
           ref={top}
