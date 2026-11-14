@@ -222,12 +222,33 @@ body {
 }
 :is(.sd-native, .sd-js) .vd-strip { opacity: var(--open); z-index: 30; }
 
-/* Project view (see ProjectStrip): each new project image settles in */
+/* Project view (see ProjectStrip) */
 @keyframes pv-in {
   from { opacity: 0; transform: scale(0.97); filter: blur(6px); }
   to { opacity: 1; transform: none; filter: none; }
 }
 .pv-in { animation: pv-in 0.7s var(--ease-out-expo) both; }
+/* Changement de projet. --d vaut 1 (projet suivant) ou -1 (précédent) :
+   la nouvelle image se dévoile en rideau depuis ce côté, l'ancienne recule de l'autre. */
+@keyframes pv-enter {
+  from {
+    clip-path: inset(0 calc(max(0, -1 * var(--d)) * 100%) 0 calc(max(0, var(--d)) * 100%) round 1.25rem);
+    transform: translateX(calc(var(--d) * 8%)) scale(1.08);
+  }
+  to { clip-path: inset(0 0 0 0 round 1.25rem); transform: none; }
+}
+@keyframes pv-leave {
+  to { transform: translateX(calc(var(--d) * -12%)) scale(0.88); opacity: 0; filter: brightness(0.3) blur(2px); }
+}
+@keyframes pv-line {
+  from { opacity: 0; transform: translateX(calc(var(--d, 1) * 32px)); filter: blur(4px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+@keyframes pv-peek { from { opacity: 0; } }
+.pv-enter { animation: pv-enter 1s cubic-bezier(0.65, 0, 0.15, 1) both; }
+.pv-leave { animation: pv-leave 1s cubic-bezier(0.65, 0, 0.15, 1) both; }
+.pv-line { animation: pv-line 0.7s var(--ease-out-expo) both; animation-delay: calc(280ms + var(--k, 0) * 70ms); }
+.pv-peek { animation: pv-peek 0.6s ease-out both; }
 
 /* Glass surfaces fall back to solid fills when transparency is unwanted */
 @media (prefers-reduced-transparency: reduce) {

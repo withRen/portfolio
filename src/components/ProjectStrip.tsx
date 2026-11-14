@@ -1,23 +1,42 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { ArrowUpRight, CaretLeft, CaretRight } from '@phosphor-icons/react';
-import { featured } from '@/data/content';
+import { featured, type Featured } from '@/data/content';
 
 /*
  * Projets dev, présentés directement en grand : un projet à la fois, grande image et
  * informations complètes, sans clic pour ouvrir. La section reste en place pendant le
  * scroll et chaque tranche de scroll affiche le projet suivant (pas de calage forcé).
- * Flèches, voisins sur les côtés et règle du haut permettent d'aller à un projet précis.
+ * Changement de projet : la nouvelle image se dévoile en rideau depuis le sens du
+ * défilement pendant que l'ancienne recule, puis le texte arrive ligne par ligne.
  */
 
 /** Hauteur de scroll consacrée à chaque projet, en fraction d'écran */
 const STEP = 0.75;
+/** Durée de la transition (doit couvrir les animations pv-* de globals.css) */
+const LEAVE_MS = 1000;
+
+type Shown = { i: number; dir: 1 | -1; from: number | null };
+
+function Cover({ p, className, style, decorative }: { p: Featured; className: string; style?: CSSProperties; decorative?: boolean }) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={p.cover}
+      alt={decorative ? '' : `Aperçu de ${p.title}`}
+      style={{ objectPosition: p.focus, aspectRatio: p.ratio ?? 16 / 10, ...style }}
+      className={`max-h-full w-full max-w-[72rem] self-center justify-self-center rounded-[1.25rem] object-cover ring-1 ring-white/10 [grid-area:1/1] md:w-auto ${className}`}
+    />
+  );
+}
 
 export default function ProjectStrip() {
   const n = featured.length;
-  const [active, setActive] = useState(0);
+  const [shown, setShown] = useState<Shown>({ i: 0, dir: 1, from: null });
   const section = useRef<HTMLDivElement>(null);
+  const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const active = shown.i;
 
   // Le projet affiché suit la progression dans la section
   useEffect(() => {
@@ -29,7 +48,12 @@ export default function ProjectStrip() {
       const step = window.innerHeight * STEP;
       const scrolled = -el.getBoundingClientRect().top;
       const i = Math.min(n - 1, Math.max(0, Math.floor((scrolled + step * 0.5) / step)));
-      setActive((a) => (a === i ? a : i));
+      setShown((s) => {
+        if (s.i === i) return s;
+        if (leaveTimer.current) clearTimeout(leaveTimer.current);
+        leaveTimer.current = setTimeout(() => setShown((t) => ({ ...t, from: null })), LEAVE_MS);
+        return { i, dir: i > s.i ? 1 : -1, from: s.i };
+      });
     };
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(pick);
@@ -41,6 +65,7 @@ export default function ProjectStrip() {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
       if (raf) cancelAnimationFrame(raf);
+      if (leaveTimer.current) clearTimeout(leaveTimer.current);
     };
   }, [n]);
 
@@ -57,6 +82,9 @@ export default function ProjectStrip() {
   const p = featured[active];
   const prev = featured[(active - 1 + n) % n];
   const next = featured[(active + 1) % n];
+  const leaving = shown.from !== null && shown.from !== active ? featured[shown.from] : null;
+  const dirStyle = { '--d': shown.dir } as CSSProperties;
+  const line = (k: number) => ({ '--d': shown.dir, '--k': k }) as CSSProperties;
 
   return (
     <div ref={section} className="relative" style={{ height: `calc(100dvh + ${(n - 1) * STEP * 100}dvh)` }}>
@@ -90,56 +118,59 @@ export default function ProjectStrip() {
         </nav>
 
         {/* Image du projet, avec ses voisins qui attendent sur les côtés */}
-        <div className="relative flex min-h-0 flex-1 items-center justify-center px-5 py-5 md:px-[9vw]">
+        <div className="relative flex min-h-0 flex-1 px-5 py-5 md:px-[9vw]">
           <button
             type="button"
             onClick={() => go(active - 1)}
             aria-label={`Projet précédent : ${prev.title}`}
-            className="group absolute left-0 top-1/2 hidden h-[56%] w-[5vw] -translate-y-1/2 overflow-hidden rounded-r-xl md:block"
+            className="group absolute left-0 top-1/2 z-20 hidden h-[56%] w-[5vw] -translate-y-1/2 overflow-hidden rounded-r-xl md:block"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={prev.cover} alt="" loading="lazy" className="size-full object-cover brightness-[0.4] grayscale transition-[filter] duration-500 group-hover:brightness-75" />
+            <img key={prev.id} src={prev.cover} alt="" loading="lazy" style={dirStyle} className="pv-peek size-full object-cover brightness-[0.4] grayscale transition-[filter] duration-500 group-hover:brightness-75" />
             <CaretLeft size={20} aria-hidden className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-zinc-50" />
           </button>
           <button
             type="button"
             onClick={() => go(active + 1)}
             aria-label={`Projet suivant : ${next.title}`}
-            className="group absolute right-0 top-1/2 hidden h-[56%] w-[5vw] -translate-y-1/2 overflow-hidden rounded-l-xl md:block"
+            className="group absolute right-0 top-1/2 z-20 hidden h-[56%] w-[5vw] -translate-y-1/2 overflow-hidden rounded-l-xl md:block"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={next.cover} alt="" loading="lazy" className="size-full object-cover brightness-[0.4] grayscale transition-[filter] duration-500 group-hover:brightness-75" />
+            <img key={next.id} src={next.cover} alt="" loading="lazy" style={dirStyle} className="pv-peek size-full object-cover brightness-[0.4] grayscale transition-[filter] duration-500 group-hover:brightness-75" />
             <CaretRight size={20} aria-hidden className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-zinc-50" />
           </button>
 
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            key={p.id}
-            src={p.cover}
-            alt={`Aperçu de ${p.title}`}
-            style={{ objectPosition: p.focus }}
-            className="pv-in aspect-[16/10] max-h-full w-full max-w-[72rem] rounded-[1.25rem] object-cover ring-1 ring-white/10 md:w-auto"
-          />
+          {/* Les deux images partagent la même case : l'ancienne recule, la nouvelle se dévoile */}
+          <div className="grid min-h-0 w-full grid-cols-[minmax(0,1fr)] grid-rows-[minmax(0,1fr)]">
+            {leaving && <Cover key={`out-${leaving.id}`} p={leaving} decorative style={dirStyle} className="pv-leave pointer-events-none" />}
+            <Cover key={p.id} p={p} style={dirStyle} className={shown.from === null ? 'pv-in' : 'pv-enter z-10'} />
+          </div>
         </div>
 
         {/* Informations complètes, lisibles sans clic */}
         <div
           key={`d-${p.id}`}
           aria-live="polite"
-          className="row-in mx-auto grid w-full max-w-[1400px] grid-cols-1 gap-3 px-5 pb-24 md:grid-cols-12 md:items-end md:gap-8 md:px-10 md:pb-24"
+          className="mx-auto grid w-full max-w-[1400px] grid-cols-1 gap-3 px-5 pb-24 md:grid-cols-12 md:items-end md:gap-8 md:px-10 md:pb-24"
         >
           <div className="md:col-span-5">
-            <p className="label text-zinc-500">
+            <p className="pv-line label text-zinc-500" style={line(0)}>
               {p.context}
               <span className="ml-3 text-zinc-600">
                 {String(active + 1).padStart(2, '0')} / {String(n).padStart(2, '0')}
               </span>
             </p>
-            <h3 className="mt-2 text-2xl font-semibold leading-tight tracking-tight text-zinc-50 md:text-4xl">{p.title}</h3>
-            <p className="mt-1 text-zinc-300 md:text-lg">{p.tagline}</p>
+            <h3 className="pv-line mt-2 text-2xl font-semibold leading-tight tracking-tight text-zinc-50 md:text-4xl" style={line(1)}>
+              {p.title}
+            </h3>
+            <p className="pv-line mt-1 text-zinc-300 md:text-lg" style={line(2)}>
+              {p.tagline}
+            </p>
           </div>
-          <p className="line-clamp-4 text-sm leading-relaxed text-zinc-400 md:col-span-4 md:line-clamp-none md:text-base">{p.desc}</p>
-          <div className="flex flex-col gap-3 md:col-span-3 md:items-end">
+          <p className="pv-line line-clamp-4 text-sm leading-relaxed text-zinc-400 md:col-span-4 md:line-clamp-none md:text-base" style={line(3)}>
+            {p.desc}
+          </p>
+          <div className="pv-line flex flex-col gap-3 md:col-span-3 md:items-end" style={line(4)}>
             <ul aria-label="Technologies" className="flex flex-wrap gap-1.5 md:justify-end">
               {p.stack.map((t) => (
                 <li key={t} className="rounded-full border border-white/12 bg-white/5 px-2.5 py-1 font-mono text-[11px] text-zinc-300">

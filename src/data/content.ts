@@ -23,6 +23,8 @@ export type Featured = {
   cover: string;
   /** object-position used when the cover is cropped into a narrow slice */
   focus?: string;
+  /** Proportions de l'image (largeur / hauteur), 16/10 par défaut */
+  ratio?: number;
   extra?: string;
   links: { label: string; href: string }[];
   layout: 'split' | 'stack' | 'split-reverse' | 'full';
@@ -89,6 +91,7 @@ export const featured: Featured[] = [
     context: 'SAÉ 5.D.01, BUT MMI 3',
     stack: ['Unity 6', 'C#', 'XR Interaction Toolkit', 'Meta Quest 3'],
     cover: asset('/projects/escapor.jpg'),
+    ratio: 16 / 9,
     focus: '50% 35%',
     links: [{ label: 'Code source', href: 'https://github.com/withRen/SAE501' }],
     layout: 'split',
@@ -101,6 +104,7 @@ export const featured: Featured[] = [
     context: 'Projet communautaire',
     stack: ['Java', 'Paper 26.3', 'Python', 'discord.py'],
     cover: asset('/projects/mmi-town.jpg'),
+    ratio: 16 / 9,
     focus: '50% 40%',
     extra: asset('/projects/mmi-town-launcher.jpg'),
     links: [],
