@@ -67,6 +67,7 @@ const fr = {
     next: 'Projet suivant',
     tech: 'Technologies',
     preview: (t: string) => `Aperçu de ${t}`,
+    swipeHint: 'Glisse pour changer de projet',
   },
   contact: {
     title: 'Un projet, une idée ?',
@@ -154,6 +155,7 @@ const en: Dict = {
     next: 'Next project',
     tech: 'Technologies',
     preview: (t: string) => `Preview of ${t}`,
+    swipeHint: 'Swipe to change project',
   },
   contact: {
     title: 'A project, an idea?',
@@ -239,6 +241,7 @@ const ru: Dict = {
     next: 'Следующий проект',
     tech: 'Технологии',
     preview: (t: string) => `Превью проекта ${t}`,
+    swipeHint: 'Смахните, чтобы сменить проект',
   },
   contact: {
     title: 'Есть проект или идея?',

@@ -254,6 +254,16 @@ body {
 .pv-leave { animation: pv-leave 1s cubic-bezier(0.65, 0, 0.15, 1) both; }
 .pv-line { animation: pv-line 0.7s var(--ease-out-expo) both; animation-delay: calc(280ms + var(--k, 0) * 70ms); }
 .pv-peek { animation: pv-peek 0.6s ease-out both; }
+/* Mobile : la carte du dessous prend la place de celle qu'on vient de balayer */
+@keyframes pv-settle {
+  from { transform: translateY(8px) scale(0.96); filter: brightness(0.75); }
+}
+.pv-settle { animation: pv-settle 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes pv-hint {
+  0%, 100% { transform: none; }
+  50% { transform: translateX(-6px); }
+}
+.pv-hint-arrow { animation: pv-hint 1.6s ease-in-out infinite; }
 
 /* Glass surfaces fall back to solid fills when transparency is unwanted */
 @media (prefers-reduced-transparency: reduce) {
