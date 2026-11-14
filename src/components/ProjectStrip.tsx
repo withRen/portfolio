@@ -163,15 +163,6 @@ export default function ProjectStrip() {
             </div>
           </div>
 
-          {/* The active project's name, huge and faint, behind the strip */}
-          <p
-            key={`bg-${shown.id}`}
-            aria-hidden
-            className="ab-ghost pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 overflow-hidden whitespace-nowrap text-center font-display text-[30vw] font-bold uppercase leading-none tracking-tight text-white/[0.035] md:text-[19vw]"
-          >
-            {shown.title}
-          </p>
-
           <ul ref={strip} className="ab-strip absolute flex items-center gap-[0.7vw]">
             {featured.map((f, i) => {
               const isActive = i === hovered;
@@ -184,7 +175,7 @@ export default function ProjectStrip() {
                     onFocus={() => setHovered(i)}
                     aria-label={`Ouvrir ${f.title}`}
                     data-active={isActive}
-                    className={`group relative block h-[52dvh] overflow-hidden bg-zinc-900 transition-[width] duration-700 ease-out-expo md:h-[58dvh] ${
+                    className={`group relative block h-[40dvh] overflow-hidden bg-zinc-900 transition-[width] duration-700 ease-out-expo md:h-[48dvh] ${
                       isActive ? 'w-[58vw] md:w-[26vw]' : 'w-[14vw] md:w-[8.5vw]'
                     }`}
                   >
@@ -202,32 +193,55 @@ export default function ProjectStrip() {
                         isActive ? 'scale-100 brightness-100 grayscale-0' : 'scale-110 brightness-[0.8] contrast-110 grayscale'
                       }`}
                     />
-                    <span className="label absolute left-3 top-3 text-zinc-50/70 mix-blend-difference md:left-4 md:top-4">
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
-                    <span
-                      aria-hidden
-                      className={`absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-zinc-950/85 to-transparent p-4 pt-16 transition-opacity duration-500 md:p-5 ${
-                        isActive ? 'opacity-100 delay-200' : 'opacity-0'
-                      }`}
-                    >
-                      <span className="whitespace-nowrap font-display text-2xl font-bold uppercase leading-none tracking-tight text-zinc-50 md:text-3xl">
-                        {f.title}
-                      </span>
-                      <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-50 text-zinc-950">
-                        <ArrowUpRight size={14} weight="regular" />
-                      </span>
-                    </span>
                   </button>
                 </li>
               );
             })}
           </ul>
 
-          {/* The active project's context, quietly, bottom left */}
-          <div key={`c-${shown.id}`} className="row-in pointer-events-none absolute bottom-24 left-5 max-w-[34ch] md:bottom-24 md:left-10">
-            <p className="label text-zinc-500">{shown.context}</p>
-            <p className="mt-2 text-lg font-medium tracking-tight text-zinc-100 md:text-xl">{shown.tagline}</p>
+          {/* Le projet actif, lisible sans cliquer : de quoi il s'agit, avec quoi c'est fait, où le voir */}
+          <div
+            key={`c-${shown.id}`}
+            className="row-in absolute inset-x-0 bottom-[5.5rem] grid grid-cols-1 gap-4 px-5 md:bottom-24 md:grid-cols-12 md:items-end md:gap-8 md:px-10"
+          >
+            <div className="md:col-span-5">
+              <p className="label text-zinc-500">{shown.context}</p>
+              <h3 className="mt-2 text-2xl font-semibold leading-tight tracking-tight text-zinc-50 md:text-4xl">{shown.title}</h3>
+              <p className="mt-2 hidden text-lg tracking-tight text-zinc-300 md:block">{shown.tagline}</p>
+            </div>
+            <p className="line-clamp-3 text-sm leading-relaxed text-zinc-300 md:col-span-4 md:line-clamp-none md:text-base md:text-zinc-400">
+              {shown.desc}
+            </p>
+            <div className="flex flex-col gap-3 md:col-span-3 md:items-end">
+              <ul aria-label="Technologies" className="flex flex-wrap gap-1.5 md:justify-end">
+                {shown.stack.map((t) => (
+                  <li key={t} className="rounded-full border border-white/12 bg-white/5 px-2.5 py-1 font-mono text-[11px] text-zinc-300">
+                    {t}
+                  </li>
+                ))}
+              </ul>
+              <div className="flex flex-wrap gap-2 md:justify-end">
+                {shown.links.slice(0, 1).map((l) => (
+                  <a
+                    key={l.href}
+                    href={l.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-full bg-zinc-50 px-4 py-2 text-sm font-medium text-zinc-950 transition-transform duration-300 hover:-translate-y-0.5 active:scale-[0.98]"
+                  >
+                    {l.label}
+                    <ArrowUpRight size={14} weight="regular" aria-hidden />
+                  </a>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => openProject(hovered)}
+                  className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-100 transition-colors duration-300 hover:bg-white/15"
+                >
+                  Voir en grand
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -277,7 +291,7 @@ export default function ProjectStrip() {
               <CaretRight size={20} weight="regular" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-zinc-50" />
             </button>
 
-            {/* Hero image with the giant title over it */}
+            {/* Image du projet en grand */}
             <div className="absolute left-1/2 top-[44%] w-[calc(100vw-2.5rem)] -translate-x-1/2 -translate-y-1/2 md:w-[min(64vw,72rem)]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -286,17 +300,6 @@ export default function ProjectStrip() {
                 className="aspect-[4/5] w-full object-cover md:aspect-[16/10]"
                 style={{ viewTransitionName: 'ab-hero' } as CSSProperties}
               />
-              <h2
-                key={p.id}
-                aria-label={p.title}
-                className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 overflow-hidden text-center font-display text-[17vw] font-bold uppercase leading-[0.82] tracking-tight text-zinc-50 mix-blend-difference md:text-[11vw]"
-              >
-                {Array.from(p.title).map((ch, k) => (
-                  <span key={k} aria-hidden className="pl-letter inline-block" style={{ '--k': k } as CSSProperties}>
-                    {ch === ' ' ? ' ' : ch}
-                  </span>
-                ))}
-              </h2>
             </div>
 
             {/* Quiet details along the bottom */}
@@ -306,8 +309,9 @@ export default function ProjectStrip() {
             >
               <div className="md:col-span-5">
                 <p className="label text-zinc-500">{p.context}</p>
-                <p className="mt-2 text-lg font-medium tracking-tight text-zinc-50 md:text-xl">{p.tagline}</p>
-                <p className="mt-2 hidden max-w-[52ch] text-sm leading-relaxed text-zinc-400 md:block">{p.desc}</p>
+                <h2 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-50 md:text-3xl">{p.title}</h2>
+                <p className="mt-1 text-lg tracking-tight text-zinc-300">{p.tagline}</p>
+                <p className="mt-2 max-w-[52ch] text-sm leading-relaxed text-zinc-400">{p.desc}</p>
               </div>
               <p className="font-mono text-xs text-zinc-400 md:col-span-3 md:text-center">{p.stack.join(', ')}</p>
               <div className="flex flex-wrap gap-2 md:col-span-4 md:justify-end">
