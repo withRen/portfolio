@@ -63,7 +63,7 @@ export default function Lightbox({ photos, index, onIndex, onClose }: Props) {
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={photo.image}
-            alt={`Photographie, ${photo.title.toLowerCase()}`}
+            alt={photo.alt}
             className="max-h-full max-w-full rounded-[1.75rem] object-contain"
           />
         )}

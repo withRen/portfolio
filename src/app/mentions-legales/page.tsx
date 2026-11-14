@@ -1,12 +1,13 @@
 import type { Metadata } from 'next';
 import LegalPage from '@/components/LegalPage';
+import { OG_BASE } from '@/lib/seo';
 import { asset, contactHref } from '@/data/content';
 
 export const metadata: Metadata = {
-  title: 'Mentions légales · Rahim Tamhaev',
+  title: 'Mentions légales',
   description: 'Éditeur, hébergeur et propriété intellectuelle du site tamhaev.dev.',
   alternates: { canonical: '/mentions-legales/' },
-  openGraph: { url: '/mentions-legales/', title: 'Mentions légales · Rahim Tamhaev' },
+  openGraph: { ...OG_BASE, type: 'article', url: '/mentions-legales/', title: 'Mentions légales · Rahim Tamhaev' },
 };
 
 export default function MentionsLegales() {

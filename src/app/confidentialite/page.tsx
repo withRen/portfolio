@@ -1,12 +1,13 @@
 import type { Metadata } from 'next';
 import LegalPage from '@/components/LegalPage';
+import { OG_BASE } from '@/lib/seo';
 import { contactHref } from '@/data/content';
 
 export const metadata: Metadata = {
-  title: 'Politique de confidentialité · Rahim Tamhaev',
+  title: 'Politique de confidentialité',
   description: 'Données personnelles, cookies et vidéos YouTube sur tamhaev.dev.',
   alternates: { canonical: '/confidentialite/' },
-  openGraph: { url: '/confidentialite/', title: 'Politique de confidentialité · Rahim Tamhaev' },
+  openGraph: { ...OG_BASE, type: 'article', url: '/confidentialite/', title: 'Politique de confidentialité · Rahim Tamhaev' },
 };
 
 export default function Confidentialite() {

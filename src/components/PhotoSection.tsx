@@ -47,7 +47,7 @@ export default function PhotoSection({ onActiveImage }: Props) {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={photo.image}
-                    alt={`Photographie, ${photo.title.toLowerCase()}`}
+                    alt={photo.alt}
                     loading="lazy"
                     draggable={false}
                     className="size-full object-cover transition-transform duration-700 ease-out-expo group-hover:scale-[1.04]"

@@ -1,349 +1,189 @@
 'use client';
 
-import { useEffect, useRef, useState, type CSSProperties } from 'react';
-import { flushSync } from 'react-dom';
-import { ArrowUpRight, CaretLeft, CaretRight, X } from '@phosphor-icons/react';
+import { useEffect, useRef, useState } from 'react';
+import { ArrowUpRight, CaretLeft, CaretRight } from '@phosphor-icons/react';
 import { featured } from '@/data/content';
 
 /*
- * Project strip (after aristidebenoist.com, Awwwards SOTD):
- * - a row of narrow black and white slices that pans sideways with the scroll (CSS
- *   scroll-driven, globals.css .ab-*); the hovered slice turns to colour;
- * - a click opens the project: the slice morphs into a large centred image (View
- *   Transitions API), a giant title sits over it, neighbours wait as slices on the edges.
+ * Projets dev, présentés directement en grand : un projet à la fois, grande image et
+ * informations complètes, sans clic pour ouvrir. La section reste en place pendant le
+ * scroll et chaque tranche de scroll affiche le projet suivant (pas de calage forcé).
+ * Flèches, voisins sur les côtés et règle du haut permettent d'aller à un projet précis.
  */
 
-type DocVT = Document & { startViewTransition?: (cb: () => void) => { finished: Promise<void> } };
-
-const TICKS = 36;
-
-function Ruler({ active, total }: { active: number | null; total: number }) {
-  return (
-    <div aria-hidden className="flex items-end gap-[5px]">
-      {Array.from({ length: TICKS }, (_, k) => {
-        const on = active !== null && Math.round((active / Math.max(1, total - 1)) * (TICKS - 1)) === k;
-        return (
-          <span
-            key={k}
-            className={`block w-px transition-[height,background-color] duration-500 ease-out-expo ${
-              on ? 'h-4 bg-zinc-50' : 'h-2.5 bg-zinc-600'
-            }`}
-          />
-        );
-      })}
-    </div>
-  );
-}
+/** Hauteur de scroll consacrée à chaque projet, en fraction d'écran */
+const STEP = 0.75;
 
 export default function ProjectStrip() {
   const n = featured.length;
-  const [hovered, setHovered] = useState(0);
-  const [open, setOpen] = useState<number | null>(null);
-  const dialog = useRef<HTMLDialogElement>(null);
-  const slices = useRef<(HTMLImageElement | null)[]>([]);
-  const strip = useRef<HTMLUListElement>(null);
+  const [active, setActive] = useState(0);
+  const section = useRef<HTMLDivElement>(null);
 
-  // The slices lean with the scroll speed, then settle
+  // Le projet affiché suit la progression dans la section
   useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    let raf: number | null = null;
-    let lastY = window.scrollY;
-    let skew = 0;
-    const tick = () => {
-      const y = window.scrollY;
-      const v = y - lastY;
-      lastY = y;
-      skew += (Math.max(-6, Math.min(6, v * 0.12)) - skew) * 0.15;
-      strip.current?.style.setProperty('--skew', `${skew.toFixed(2)}deg`);
-      raf = Math.abs(skew) > 0.02 || Math.abs(v) > 0 ? requestAnimationFrame(tick) : null;
-    };
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(tick);
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, []);
-
-  const vt = (update: () => void) => {
-    const doc = document as DocVT;
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!doc.startViewTransition || reduce) {
-      update();
-      return;
-    }
-    doc.startViewTransition(update);
-  };
-
-  const openProject = (i: number) => {
-    const slice = slices.current[i];
-    if (slice) slice.style.viewTransitionName = 'ab-hero';
-    vt(() => {
-      if (slice) slice.style.viewTransitionName = '';
-      flushSync(() => setOpen(i));
-      if (!dialog.current?.open) dialog.current?.showModal();
-      document.body.style.overflow = 'hidden';
-    });
-  };
-
-  const closeProject = () => {
-    const i = open;
-    vt(() => {
-      flushSync(() => setOpen(null));
-      dialog.current?.close();
-      if (i !== null && slices.current[i]) slices.current[i]!.style.viewTransitionName = 'ab-hero';
-    });
-    // Clear the name once the morph is done so the next opening can reuse it
-    setTimeout(() => {
-      if (i !== null && slices.current[i]) slices.current[i]!.style.viewTransitionName = '';
-    }, 900);
-  };
-
-  const go = (delta: number) => {
-    if (open === null) return;
-    vt(() => flushSync(() => setOpen((open + delta + n) % n)));
-  };
-
-  useEffect(() => {
-    const d = dialog.current;
-    if (!d) return;
-    const onCancel = (e: Event) => {
-      e.preventDefault();
-      closeProject();
-    };
-    d.addEventListener('cancel', onCancel);
-    return () => d.removeEventListener('cancel', onCancel);
-  });
-
-  const p = open !== null ? featured[open] : null;
-  const prev = open !== null ? featured[(open - 1 + n) % n] : null;
-  const next = open !== null ? featured[(open + 1) % n] : null;
-  const shown = featured[hovered];
-
-  // Touch screens have no hover: the slice closest to the centre of the screen is the active one
-  useEffect(() => {
-    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
     let raf: number | null = null;
     const pick = () => {
       raf = null;
-      const mid = window.innerWidth / 2;
-      let best = 0;
-      let dist = Infinity;
-      slices.current.forEach((img, i) => {
-        const r = img?.parentElement?.getBoundingClientRect();
-        if (!r) return;
-        const d = Math.abs(r.left + r.width / 2 - mid);
-        if (d < dist) {
-          dist = d;
-          best = i;
-        }
-      });
-      setHovered((h) => (h === best ? h : best));
+      const el = section.current;
+      if (!el) return;
+      const step = window.innerHeight * STEP;
+      const scrolled = -el.getBoundingClientRect().top;
+      const i = Math.min(n - 1, Math.max(0, Math.floor((scrolled + step * 0.5) / step)));
+      setActive((a) => (a === i ? a : i));
     };
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(pick);
     };
     pick();
     window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
     return () => {
       window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
       if (raf) cancelAnimationFrame(raf);
     };
-  }, []);
+  }, [n]);
+
+  // Aller à un projet = faire défiler jusqu'à sa tranche
+  const go = (i: number) => {
+    const el = section.current;
+    if (!el) return;
+    const target = (i + n) % n;
+    const top = el.getBoundingClientRect().top + window.scrollY + target * window.innerHeight * STEP;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top, behavior: reduce ? 'auto' : 'smooth' });
+  };
+
+  const p = featured[active];
+  const prev = featured[(active - 1 + n) % n];
+  const next = featured[(active + 1) % n];
 
   return (
-    <>
-      <div className="ab-section relative">
-        <div className="ab-stage relative h-[100dvh] overflow-hidden">
-          <div className="absolute inset-x-0 top-8 flex justify-center md:top-10">
-            <div className="ab-ruler">
-              <Ruler active={null} total={n} />
-            </div>
-          </div>
-
-          <ul ref={strip} className="ab-strip absolute flex items-center gap-[0.7vw]">
-            {featured.map((f, i) => {
-              const isActive = i === hovered;
-              return (
-                <li key={f.id} className="ab-item">
-                  <button
-                    type="button"
-                    onClick={() => openProject(i)}
-                    onPointerEnter={() => setHovered(i)}
-                    onFocus={() => setHovered(i)}
-                    aria-label={`Ouvrir ${f.title}`}
-                    data-active={isActive}
-                    className={`group relative block h-[40dvh] overflow-hidden bg-zinc-900 transition-[width] duration-700 ease-out-expo md:h-[48dvh] ${
-                      isActive ? 'w-[58vw] md:w-[26vw]' : 'w-[14vw] md:w-[8.5vw]'
-                    }`}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      ref={(el) => {
-                        slices.current[i] = el;
-                      }}
-                      src={f.cover}
-                      alt=""
-                      loading="lazy"
-                      draggable={false}
-                      style={{ objectPosition: f.focus }}
-                      className={`size-full object-cover transition-[filter,transform] duration-700 ease-out-expo ${
-                        isActive ? 'scale-100 brightness-100 grayscale-0' : 'scale-110 brightness-[0.8] contrast-110 grayscale'
-                      }`}
-                    />
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-
-          {/* Le projet actif, lisible sans cliquer : de quoi il s'agit, avec quoi c'est fait, où le voir */}
-          <div
-            key={`c-${shown.id}`}
-            className="row-in absolute inset-x-0 bottom-[5.5rem] grid grid-cols-1 gap-4 px-5 md:bottom-24 md:grid-cols-12 md:items-end md:gap-8 md:px-10"
-          >
-            <div className="md:col-span-5">
-              <p className="label text-zinc-500">{shown.context}</p>
-              <h3 className="mt-2 text-2xl font-semibold leading-tight tracking-tight text-zinc-50 md:text-4xl">{shown.title}</h3>
-              <p className="mt-2 hidden text-lg tracking-tight text-zinc-300 md:block">{shown.tagline}</p>
-            </div>
-            <p className="line-clamp-3 text-sm leading-relaxed text-zinc-300 md:col-span-4 md:line-clamp-none md:text-base md:text-zinc-400">
-              {shown.desc}
-            </p>
-            <div className="flex flex-col gap-3 md:col-span-3 md:items-end">
-              <ul aria-label="Technologies" className="flex flex-wrap gap-1.5 md:justify-end">
-                {shown.stack.map((t) => (
-                  <li key={t} className="rounded-full border border-white/12 bg-white/5 px-2.5 py-1 font-mono text-[11px] text-zinc-300">
-                    {t}
-                  </li>
-                ))}
-              </ul>
-              <div className="flex flex-wrap gap-2 md:justify-end">
-                {shown.links.slice(0, 1).map((l) => (
-                  <a
-                    key={l.href}
-                    href={l.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-full bg-zinc-50 px-4 py-2 text-sm font-medium text-zinc-950 transition-transform duration-300 hover:-translate-y-0.5 active:scale-[0.98]"
-                  >
-                    {l.label}
-                    <ArrowUpRight size={14} weight="regular" aria-hidden />
-                  </a>
-                ))}
+    <div ref={section} className="relative" style={{ height: `calc(100dvh + ${(n - 1) * STEP * 100}dvh)` }}>
+      <div
+        className="sticky top-0 flex h-[100dvh] flex-col overflow-hidden"
+        role="region"
+        aria-roledescription="carrousel"
+        aria-label="Projets de développement"
+      >
+        {/* Règle : un trait par projet, cliquable */}
+        <nav aria-label="Choisir un projet" className="flex justify-center pt-6 md:pt-8">
+          <ul className="flex items-end gap-1">
+            {featured.map((f, i) => (
+              <li key={f.id}>
                 <button
                   type="button"
-                  onClick={() => openProject(hovered)}
-                  className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-100 transition-colors duration-300 hover:bg-white/15"
+                  onClick={() => go(i)}
+                  aria-label={f.title}
+                  aria-current={i === active ? 'true' : undefined}
+                  className="group flex h-8 items-end px-2"
                 >
-                  Voir en grand
+                  <span
+                    className={`block w-px transition-[height,background-color] duration-500 ${
+                      i === active ? 'h-6 bg-zinc-50' : 'h-3 bg-zinc-600 group-hover:bg-zinc-300'
+                    }`}
+                  />
                 </button>
-              </div>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        {/* Image du projet, avec ses voisins qui attendent sur les côtés */}
+        <div className="relative flex min-h-0 flex-1 items-center justify-center px-5 py-5 md:px-[9vw]">
+          <button
+            type="button"
+            onClick={() => go(active - 1)}
+            aria-label={`Projet précédent : ${prev.title}`}
+            className="group absolute left-0 top-1/2 hidden h-[56%] w-[5vw] -translate-y-1/2 overflow-hidden rounded-r-xl md:block"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={prev.cover} alt="" loading="lazy" className="size-full object-cover brightness-[0.4] grayscale transition-[filter] duration-500 group-hover:brightness-75" />
+            <CaretLeft size={20} aria-hidden className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-zinc-50" />
+          </button>
+          <button
+            type="button"
+            onClick={() => go(active + 1)}
+            aria-label={`Projet suivant : ${next.title}`}
+            className="group absolute right-0 top-1/2 hidden h-[56%] w-[5vw] -translate-y-1/2 overflow-hidden rounded-l-xl md:block"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={next.cover} alt="" loading="lazy" className="size-full object-cover brightness-[0.4] grayscale transition-[filter] duration-500 group-hover:brightness-75" />
+            <CaretRight size={20} aria-hidden className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-zinc-50" />
+          </button>
+
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            key={p.id}
+            src={p.cover}
+            alt={`Aperçu de ${p.title}`}
+            style={{ objectPosition: p.focus }}
+            className="pv-in aspect-[16/10] max-h-full w-full max-w-[72rem] rounded-[1.25rem] object-cover ring-1 ring-white/10 md:w-auto"
+          />
+        </div>
+
+        {/* Informations complètes, lisibles sans clic */}
+        <div
+          key={`d-${p.id}`}
+          aria-live="polite"
+          className="row-in mx-auto grid w-full max-w-[1400px] grid-cols-1 gap-3 px-5 pb-24 md:grid-cols-12 md:items-end md:gap-8 md:px-10 md:pb-24"
+        >
+          <div className="md:col-span-5">
+            <p className="label text-zinc-500">
+              {p.context}
+              <span className="ml-3 text-zinc-600">
+                {String(active + 1).padStart(2, '0')} / {String(n).padStart(2, '0')}
+              </span>
+            </p>
+            <h3 className="mt-2 text-2xl font-semibold leading-tight tracking-tight text-zinc-50 md:text-4xl">{p.title}</h3>
+            <p className="mt-1 text-zinc-300 md:text-lg">{p.tagline}</p>
+          </div>
+          <p className="line-clamp-4 text-sm leading-relaxed text-zinc-400 md:col-span-4 md:line-clamp-none md:text-base">{p.desc}</p>
+          <div className="flex flex-col gap-3 md:col-span-3 md:items-end">
+            <ul aria-label="Technologies" className="flex flex-wrap gap-1.5 md:justify-end">
+              {p.stack.map((t) => (
+                <li key={t} className="rounded-full border border-white/12 bg-white/5 px-2.5 py-1 font-mono text-[11px] text-zinc-300">
+                  {t}
+                </li>
+              ))}
+            </ul>
+            <div className="flex flex-wrap items-center gap-2 md:justify-end">
+              {p.links.map((l, i) => (
+                <a
+                  key={l.href}
+                  href={l.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-[transform,background-color] duration-300 hover:-translate-y-0.5 active:scale-[0.98] ${
+                    i === 0 ? 'bg-zinc-50 text-zinc-950' : 'border border-white/20 bg-white/5 text-zinc-100 hover:bg-white/15'
+                  }`}
+                >
+                  {l.label}
+                  <ArrowUpRight size={14} aria-hidden />
+                </a>
+              ))}
+              <span className="ml-auto flex gap-2 md:hidden">
+                <button
+                  type="button"
+                  onClick={() => go(active - 1)}
+                  aria-label="Projet précédent"
+                  className="inline-flex size-10 items-center justify-center rounded-full border border-white/15 text-zinc-100"
+                >
+                  <CaretLeft size={16} aria-hidden />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => go(active + 1)}
+                  aria-label="Projet suivant"
+                  className="inline-flex size-10 items-center justify-center rounded-full border border-white/15 text-zinc-100"
+                >
+                  <CaretRight size={16} aria-hidden />
+                </button>
+              </span>
             </div>
           </div>
         </div>
       </div>
-
-      <dialog
-        ref={dialog}
-        aria-label={p ? p.title : 'Projet'}
-        onClose={() => {
-          setOpen(null);
-          document.body.style.overflow = '';
-        }}
-        className="m-0 h-[100dvh] max-h-none w-screen max-w-none overflow-hidden bg-zinc-950/85 p-0 text-zinc-100 backdrop-blur-2xl"
-      >
-        {p && prev && next && (
-          <div className="relative size-full">
-            <div className="absolute inset-x-0 top-8 flex items-center justify-center gap-4 md:top-10">
-              <Ruler active={open} total={n} />
-            </div>
-            <button
-              type="button"
-              onClick={closeProject}
-              aria-label="Fermer le projet"
-              className="absolute right-5 top-5 z-20 inline-flex size-11 items-center justify-center rounded-full border border-white/15 bg-white/5 text-zinc-100 transition-colors duration-300 hover:bg-zinc-100 hover:text-zinc-950 active:scale-[0.96] md:right-10 md:top-7"
-            >
-              <X size={18} weight="regular" />
-            </button>
-
-            {/* Neighbours wait as slices on the edges */}
-            <button
-              type="button"
-              onClick={() => go(-1)}
-              aria-label={`Projet précédent : ${prev.title}`}
-              className="group absolute left-0 top-1/2 hidden h-[52dvh] w-[7vw] -translate-y-1/2 overflow-hidden md:block"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={prev.cover} alt="" className="size-full object-cover brightness-50 grayscale transition-[filter] duration-500 group-hover:brightness-90" />
-              <CaretLeft size={20} weight="regular" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-zinc-50" />
-            </button>
-            <button
-              type="button"
-              onClick={() => go(1)}
-              aria-label={`Projet suivant : ${next.title}`}
-              className="group absolute right-0 top-1/2 hidden h-[52dvh] w-[7vw] -translate-y-1/2 overflow-hidden md:block"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={next.cover} alt="" className="size-full object-cover brightness-50 grayscale transition-[filter] duration-500 group-hover:brightness-90" />
-              <CaretRight size={20} weight="regular" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-zinc-50" />
-            </button>
-
-            {/* Image du projet en grand */}
-            <div className="absolute left-1/2 top-[44%] w-[calc(100vw-2.5rem)] -translate-x-1/2 -translate-y-1/2 md:w-[min(64vw,72rem)]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={p.cover}
-                alt={`Aperçu de ${p.title}`}
-                className="aspect-[4/5] w-full object-cover md:aspect-[16/10]"
-                style={{ viewTransitionName: 'ab-hero' } as CSSProperties}
-              />
-            </div>
-
-            {/* Quiet details along the bottom */}
-            <div
-              key={`d-${p.id}`}
-              className="row-in absolute inset-x-0 bottom-0 grid grid-cols-1 gap-4 p-5 md:grid-cols-12 md:items-end md:gap-6 md:px-10 md:pb-10"
-            >
-              <div className="md:col-span-5">
-                <p className="label text-zinc-500">{p.context}</p>
-                <h2 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-50 md:text-3xl">{p.title}</h2>
-                <p className="mt-1 text-lg tracking-tight text-zinc-300">{p.tagline}</p>
-                <p className="mt-2 max-w-[52ch] text-sm leading-relaxed text-zinc-400">{p.desc}</p>
-              </div>
-              <p className="font-mono text-xs text-zinc-400 md:col-span-3 md:text-center">{p.stack.join(', ')}</p>
-              <div className="flex flex-wrap gap-2 md:col-span-4 md:justify-end">
-                {p.links.map((l, i) => (
-                  <a
-                    key={l.href}
-                    href={l.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-[transform,background-color] duration-300 hover:-translate-y-0.5 active:scale-[0.98] ${
-                      i === 0
-                        ? 'bg-zinc-50 text-zinc-950'
-                        : 'border border-white/20 bg-white/5 text-zinc-100 hover:bg-white/15'
-                    }`}
-                  >
-                    {l.label}
-                    <ArrowUpRight size={14} weight="regular" aria-hidden />
-                  </a>
-                ))}
-                <div className="flex gap-2 md:hidden">
-                  <button type="button" onClick={() => go(-1)} aria-label="Projet précédent" className="inline-flex size-11 items-center justify-center rounded-full border border-white/15 text-zinc-100">
-                    <CaretLeft size={18} weight="regular" />
-                  </button>
-                  <button type="button" onClick={() => go(1)} aria-label="Projet suivant" className="inline-flex size-11 items-center justify-center rounded-full border border-white/15 text-zinc-100">
-                    <CaretRight size={18} weight="regular" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </dialog>
-    </>
+    </div>
   );
 }

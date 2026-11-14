@@ -1,8 +1,17 @@
 export const asset = (path: string) => `${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}${path}`;
 
-export type Photo = { id: string; title: string; image: string; ratio: number };
+export type Photo = { id: string; title: string; alt: string; image: string; ratio: number };
 
-export type Video = { id: string; title: string; type: string; href: string };
+export type Video = {
+  id: string;
+  title: string;
+  type: string;
+  href: string;
+  /** Date de mise en ligne sur YouTube (ISO 8601), pour les données structurées */
+  uploaded: string;
+  /** Durée au format ISO 8601 */
+  duration: string;
+};
 
 export type Project = {
   id: string;
@@ -30,52 +39,55 @@ export type Featured = {
 };
 
 
-const photo = (file: string, title: string, h: number): Photo => ({
+const photo = (file: string, title: string, h: number, alt: string): Photo => ({
   id: file,
   title,
+  alt,
   image: asset(`/photos/${file}.webp`),
   ratio: 1000 / h,
 });
 
 export const photos: Photo[] = [
-  photo('DSC00328-Enhanced-NR-2', 'Sans titre', 1500),
-  photo('20250525_131001', 'Mai 2025', 750),
-  photo('IMG_0361', 'Sans titre', 1333),
-  photo('hellebore_1', 'Hellébore I', 666),
-  photo('20250525_140010', 'Mai 2025', 1333),
-  photo('park_ducks', 'Scène de parc', 666),
-  photo('IMG_20250118_173738', 'Janvier 2025', 750),
-  photo('corner_building', 'Corner Building', 1501),
-  photo('20250525_132308', 'Mai 2025', 750),
-  photo('DSC00342-Enhanced-NR', 'Sans titre', 1500),
-  photo('hellebore_2', 'Hellébore II', 666),
-  photo('IMG_20240929_212728', 'Septembre 2024', 1333),
-  photo('IMG_0356', 'Sans titre', 1333),
-  photo('20250525_140729', 'Mai 2025', 750),
-  photo('DSC00334-Enhanced-NR', 'Sans titre', 1500),
-  photo('20250525_132728', 'Mai 2025', 1333),
-  photo('hellebore_3', 'Hellébore III', 666),
-  photo('IMG_20250118_173535', 'Janvier 2025', 1333),
-  photo('IMG_20250118_173443', 'Janvier 2025', 1333),
+  photo('DSC00328-Enhanced-NR-2', 'Sans titre', 1500, 'Bateau de plaisance amarré le long d’un quai, sous un ciel bleu et nuageux'),
+  photo('20250525_131001', 'Mai 2025', 750, 'Sentier de gravier au pied d’une falaise creusée, bordé de fleurs roses'),
+  photo('IMG_0361', 'Sans titre', 1333, 'Façade de brique et de pierre d’un bâtiment du XIXe siècle, vue en contre-plongée'),
+  photo('hellebore_1', 'Hellébore I', 666, 'Feuilles et fleurs vertes d’hellébore en lumière rasante'),
+  photo('20250525_140010', 'Mai 2025', 1333, 'Ruisseau au fond d’une gorge calcaire, entre falaises et végétation'),
+  photo('park_ducks', 'Scène de parc', 666, 'Canal bordé d’une passerelle à garde-corps, avec des canards sur l’eau'),
+  photo('IMG_20250118_173738', 'Janvier 2025', 750, 'Vieilles maisons de pierre au pied d’une colline boisée, en hiver'),
+  photo('corner_building', 'Corner Building', 1501, 'Immeuble d’angle haussmannien aux balcons en fer forgé, dans une rue ensoleillée'),
+  photo('20250525_132308', 'Mai 2025', 750, 'Arche naturelle de roche ouvrant sur une vallée verdoyante'),
+  photo('DSC00342-Enhanced-NR', 'Sans titre', 1500, 'Ruelle pavée de nuit, éclairée par une lanterne et la vitrine d’un restaurant'),
+  photo('hellebore_2', 'Hellébore II', 666, 'Touffe d’hellébore aux fleurs vert pâle, fond sombre'),
+  photo('IMG_20240929_212728', 'Septembre 2024', 1333, 'Tour de brique et de pierre d’une villa ancienne, entourée d’arbres'),
+  photo('IMG_0356', 'Sans titre', 1333, 'Tourelle d’un bâtiment en brique rouge et pierre blanche sous un ciel couvert'),
+  photo('20250525_140729', 'Mai 2025', 750, 'Chemin fleuri dans une gorge, menant à un pont de pierre à arches'),
+  photo('DSC00334-Enhanced-NR', 'Sans titre', 1500, 'Fontaine de pierre et moto garée sur une place pavée, de nuit'),
+  photo('20250525_132728', 'Mai 2025', 1333, 'Chemin longeant un ruisseau au pied de falaises calcaires'),
+  photo('hellebore_3', 'Hellébore III', 666, 'Fleurs d’hellébore vertes parmi des feuilles découpées'),
+  photo('IMG_20250118_173535', 'Janvier 2025', 1333, 'Silhouette marchant sur une route de montagne au crépuscule, près d’un passage piéton'),
+  photo('IMG_20250118_173443', 'Janvier 2025', 1333, 'Village de pierre au crépuscule, à travers des branches nues'),
 ];
 
 // Miniatures copiées dans public/films (scripts/fetch-thumbs.sh) : aucune requête vers
 // les serveurs de Google tant que le visiteur n'a pas choisi de lire une vidéo (RGPD).
 export const ytThumb = (id: string) => asset(`/films/${id}.jpg`);
 
-const video = (id: string, title: string, type: string): Video => ({
+const video = (id: string, title: string, type: string, uploaded: string, duration: string): Video => ({
   id,
   title,
   type,
+  uploaded,
+  duration,
   href: `https://youtu.be/${id}`,
 });
 
 export const videos: Video[] = [
-  video('zNx36iwjhD8', 'Pub de montre', 'Publicité produit'),
-  video('aPt2vD_mj0k', 'Publicité sur la musique', 'Court-métrage publicitaire'),
-  video('OSng25-tAkc', 'Europe en 2100', 'Documentaire fictif'),
-  video('LTE60C6riRU', 'Amentia', 'Projet créatif'),
-  video('IzuP73MLAhQ', 'Intro Kill Bill', 'Générique alternatif'),
+  video('zNx36iwjhD8', 'Pub de montre', 'Publicité produit', '2025-11-23', 'PT1M19S'),
+  video('aPt2vD_mj0k', 'Publicité sur la musique', 'Court-métrage publicitaire', '2025-05-31', 'PT1M'),
+  video('OSng25-tAkc', 'Europe en 2100', 'Documentaire fictif', '2025-05-23', 'PT1M56S'),
+  video('LTE60C6riRU', 'Amentia', 'Projet créatif', '2025-06-07', 'PT49S'),
+  video('IzuP73MLAhQ', 'Intro Kill Bill', 'Générique alternatif', '2026-02-26', 'PT21S'),
 ];
 
 export const featured: Featured[] = [

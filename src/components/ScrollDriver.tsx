@@ -36,9 +36,6 @@ export default function ScrollDriver() {
         const n = Number(getComputedStyle(vd).getPropertyValue('--n')) || 1;
         vd.style.setProperty('--vd', (-1 + contain(vd.getBoundingClientRect(), vh) * n).toFixed(4));
       }
-
-      const ab = document.querySelector<HTMLElement>('.ab-section');
-      if (ab) ab.style.setProperty('--abp', contain(ab.getBoundingClientRect(), vh).toFixed(4));
     };
 
     const onScroll = () => {
