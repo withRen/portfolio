@@ -29,7 +29,14 @@ export const metadata: Metadata = {
     title: TITLE,
     description: 'Développement web, mobile, desktop et VR, vidéo et photographie.',
   },
-  icons: { apple: '/apple-touch-icon.png' },
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: '48x48' },
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/icon-512.png', type: 'image/png', sizes: '512x512' },
+    ],
+    apple: '/apple-touch-icon.png',
+  },
   twitter: { card: 'summary_large_image', images: ['/og.png'], title: TITLE, description: 'Développement web, mobile, desktop et VR, vidéo et photographie.' },
 };
 
