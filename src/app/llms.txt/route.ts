@@ -1,4 +1,4 @@
-import { featured, otherProjects, socials, tools, videos } from '@/data/content';
+import { featured, socials, tools, videos } from '@/data/content';
 import { DESCRIPTION, NAME, SITE } from '@/lib/seo';
 
 /*
@@ -21,11 +21,6 @@ export function GET() {
     ...featured.map((p) => {
       const link = p.links[0] ? ` Lien : ${p.links[0].href}` : '';
       return `- **${p.title}** (${p.context}) : ${p.tagline} ${p.desc} Technologies : ${p.stack.join(', ')}.${link}`;
-    }),
-    ...otherProjects.map((p) => {
-      const link = p.href ? ` Lien : ${p.href}` : '';
-      const status = p.status ? ` (${p.status.toLowerCase()})` : '';
-      return `- **${p.title}**${status} : ${p.desc} Technologies : ${p.stack.join(', ')}.${link}`;
     }),
     '',
     '## Vidéos',

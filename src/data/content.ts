@@ -13,16 +13,6 @@ export type Video = {
   duration: string;
 };
 
-export type Project = {
-  id: string;
-  title: string;
-  desc: string;
-  stack: string[];
-  href?: string;
-  image?: string;
-  status?: string;
-};
-
 export type Featured = {
   id: string;
   title: string;
@@ -163,37 +153,6 @@ export const featured: Featured[] = [
     focus: '68% 60%',
     links: [{ label: 'Voir le site', href: 'https://www.imma-nence.com/' }],
     layout: 'full',
-  },
-];
-
-export const otherProjects: Project[] = [
-  {
-    id: 'legoshop',
-    title: 'LegoShop',
-    desc: 'Plateforme e-commerce complète : wishlist, catalogue de sets, notation et messagerie entre passionnés. Projet académique SAE 203.',
-    stack: ['PHP', 'MySQL', 'JavaScript'],
-    href: 'https://web-mmi2.iutbeziers.fr/~rahim.tamhaev/SAE203/',
-  },
-  {
-    id: 'aim-trainer-pro',
-    title: 'Aim Trainer Pro',
-    desc: "Logiciel desktop d'entraînement à la visée, avec statistiques et graphiques de précision.",
-    stack: ['Electron', 'TypeScript'],
-    href: 'https://github.com/withRen/aim-trainer-pro',
-  },
-  {
-    id: 'zwyx',
-    title: 'Zwyx',
-    desc: "Compagnon de productivité pour l'écosystème Apple : tâches, notes et rappels dans une interface native.",
-    stack: ['Swift', 'SwiftUI', 'macOS', 'iOS'],
-    href: 'https://github.com/withRen/Zwyx',
-  },
-  {
-    id: 'horizon',
-    title: 'Horizon',
-    desc: "Application d'organisation personnelle et de gestion du quotidien, avec synchronisation cloud multi-plateformes.",
-    stack: ['SwiftUI', 'Kotlin'],
-    status: 'En cours',
   },
 ];
 

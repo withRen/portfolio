@@ -1,4 +1,4 @@
-import { featured, otherProjects, socials, videos } from '@/data/content';
+import { featured, socials, videos } from '@/data/content';
 
 /*
  * Référencement : constantes du site et données structurées schema.org (JSON-LD).
@@ -71,16 +71,16 @@ export function homeJsonLd() {
     sameAs: socials.map((s) => s.href),
   };
 
-  const projects = [...featured, ...otherProjects].map((p, i) => {
-    const link = 'links' in p ? p.links[0]?.href : p.href;
-    const image = 'cover' in p ? p.cover : p.image;
+  const projects = featured.map((p, i) => {
+    const link = p.links[0]?.href;
+    const image = p.cover;
     return {
       '@type': 'ListItem',
       position: i + 1,
       item: {
         '@type': 'CreativeWork',
         name: p.title,
-        ...('tagline' in p ? { headline: p.tagline } : {}),
+        headline: p.tagline,
         description: p.desc,
         keywords: p.stack.join(', '),
         creator: { '@id': PERSON },
