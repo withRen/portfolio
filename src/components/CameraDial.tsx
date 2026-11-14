@@ -109,7 +109,12 @@ export default function CameraDial({ active, onSelect }: Props) {
       if (drag.current) return;
       const pos = posFromScroll(tops());
       draw(pos);
-      setVisible(pos > 0.55 || window.scrollY > window.innerHeight * 2.2);
+      // Le sélecteur s'efface quand le pied de page arrive : il ne doit jamais masquer ses liens
+      const foot = document.getElementById('site-footer');
+      const nearFooter = !!foot && foot.getBoundingClientRect().top < window.innerHeight - 24;
+      const show = !nearFooter && (pos > 0.55 || window.scrollY > window.innerHeight * 2.2);
+      setVisible(show);
+      if (!show) setOpen(false);
       setFit(Math.min(1, (window.innerWidth - 24) / W));
     };
     const onScroll = () => {
@@ -190,8 +195,10 @@ export default function CameraDial({ active, onSelect }: Props) {
   return (
     <nav
       aria-label="Sections"
+      aria-hidden={!visible || undefined}
+      inert={!visible || undefined}
       className={`pointer-events-none fixed inset-x-0 bottom-3 z-40 flex flex-col items-center transition-[opacity,transform] duration-500 ease-out-expo md:bottom-5 ${
-        visible ? 'opacity-100' : 'translate-y-4 opacity-0'
+        visible ? 'opacity-100' : 'translate-y-4 opacity-0 [&_*]:!pointer-events-none'
       }`}
     >
       {/* Hidden native switch: clicking its label gives a haptic tick on iOS Safari */}
