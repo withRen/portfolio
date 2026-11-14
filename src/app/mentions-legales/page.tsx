@@ -49,6 +49,13 @@ export default function MentionsLegales() {
       <h2>Crédits</h2>
       <ul>
         <li>Polices Geist et Geist Mono (Vercel) et Barlow Condensed, sous licence SIL Open Font License.</li>
+        <li>
+          Logo (monogramme RT) créé avec l’intelligence artificielle de{' '}
+          <a href="https://www.recraft.ai" target="_blank" rel="noopener noreferrer">
+            Recraft
+          </a>
+          , puis adapté pour le site.
+        </li>
         <li>Icônes Phosphor, sous licence MIT.</li>
         <li>Vidéos hébergées par YouTube, lues uniquement avec votre accord.</li>
       </ul>
