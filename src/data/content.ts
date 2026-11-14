@@ -284,29 +284,6 @@ type FeaturedSrc = Omit<Featured, 'tagline' | 'desc' | 'context' | 'links'> & {
 
 const featuredSrc: FeaturedSrc[] = [
   {
-    id: 'bitume',
-    title: 'Bitume',
-    tagline: {
-      fr: 'La carte collaborative des spots photo auto et moto.',
-      en: 'A collaborative map of car and motorcycle photo spots.',
-      ru: 'Совместная карта мест для съёмки машин и мотоциклов.',
-    },
-    desc: {
-      fr: 'Rooftops, tunnels, cols : chaque spot a sa fiche (meilleure lumière, accès) et son chat en direct pour savoir qui y est ce soir. Spots synchronisés entre tous les navigateurs, garage de favoris et mode hors ligne.',
-      en: 'Rooftops, tunnels, mountain passes: each spot has its own sheet (best light, access) and a live chat to see who’s there tonight. Spots sync across every browser, with a garage of favourites and an offline mode.',
-      ru: 'Крыши, тоннели, перевалы: у каждого места есть карточка (лучший свет, подъезд) и живой чат, где видно, кто там сегодня вечером. Места синхронизируются между всеми браузерами, есть «гараж» избранного и офлайн-режим.',
-    },
-    context: {
-      fr: 'Hack’Atlas (R505), BUT MMI 3',
-      en: 'University project Hack’Atlas (R505), BUT MMI year 3',
-      ru: 'Учебный проект Hack’Atlas (R505), BUT MMI, 3-й курс',
-    },
-    stack: ['React 19', 'Redux Toolkit', 'React-Leaflet', 'Socket.io', 'Node.js'],
-    cover: asset('/projects/bitume.jpg'),
-    focus: '30% 40%',
-    links: [{ label: { fr: 'Code source', en: 'Source code', ru: 'Исходный код' }, href: 'https://github.com/withRen/bitume' }],
-  },
-  {
     id: 'escapor',
     title: 'The Last Escapor',
     tagline: {
@@ -329,6 +306,29 @@ const featuredSrc: FeaturedSrc[] = [
     ratio: 16 / 9,
     focus: '50% 35%',
     links: [{ label: { fr: 'Code source', en: 'Source code', ru: 'Исходный код' }, href: 'https://github.com/withRen/SAE501' }],
+  },
+  {
+    id: 'bitume',
+    title: 'Bitume',
+    tagline: {
+      fr: 'La carte collaborative des spots photo auto et moto.',
+      en: 'A collaborative map of car and motorcycle photo spots.',
+      ru: 'Совместная карта мест для съёмки машин и мотоциклов.',
+    },
+    desc: {
+      fr: 'Rooftops, tunnels, cols : chaque spot a sa fiche (meilleure lumière, accès) et son chat en direct pour savoir qui y est ce soir. Spots synchronisés entre tous les navigateurs, garage de favoris et mode hors ligne.',
+      en: 'Rooftops, tunnels, mountain passes: each spot has its own sheet (best light, access) and a live chat to see who’s there tonight. Spots sync across every browser, with a garage of favourites and an offline mode.',
+      ru: 'Крыши, тоннели, перевалы: у каждого места есть карточка (лучший свет, подъезд) и живой чат, где видно, кто там сегодня вечером. Места синхронизируются между всеми браузерами, есть «гараж» избранного и офлайн-режим.',
+    },
+    context: {
+      fr: 'Hack’Atlas (R505), BUT MMI 3',
+      en: 'University project Hack’Atlas (R505), BUT MMI year 3',
+      ru: 'Учебный проект Hack’Atlas (R505), BUT MMI, 3-й курс',
+    },
+    stack: ['React 19', 'Redux Toolkit', 'React-Leaflet', 'Socket.io', 'Node.js'],
+    cover: asset('/projects/bitume.jpg'),
+    focus: '30% 40%',
+    links: [{ label: { fr: 'Code source', en: 'Source code', ru: 'Исходный код' }, href: 'https://github.com/withRen/bitume' }],
   },
   {
     id: 'mmi-town',
