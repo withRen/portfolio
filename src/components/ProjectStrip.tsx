@@ -37,7 +37,7 @@ export default function ProjectStrip() {
   return (
     <div
       className="relative h-[100svh] md:h-[var(--strip-h)]"
-      style={{ '--strip-h': `calc(100dvh + ${(n - 1) * STEP * 100}dvh)` } as CSSProperties}
+      style={{ '--strip-h': `calc(100svh + ${(n - 1) * STEP * 100}svh)` } as CSSProperties}
     >
       {mobile ? <MobileDeck /> : <DesktopStage />}
     </div>

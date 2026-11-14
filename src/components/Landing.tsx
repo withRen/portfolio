@@ -34,7 +34,7 @@ export default function Landing({ onNav }: Props) {
     const wide = window.matchMedia('(min-width: 768px)');
     let raf: number | null = null;
 
-    if (reduce && section.current) section.current.style.height = '100dvh';
+    if (reduce && section.current) section.current.style.height = '100svh';
 
     const apply = () => {
       raf = null;
@@ -86,8 +86,8 @@ export default function Landing({ onNav }: Props) {
   const toWork = () => onNav('photos');
 
   return (
-    <section ref={section} id="top" aria-label={t.landing.region} className="relative h-[300dvh] text-zinc-50">
-      <div aria-hidden className="intro-snap pointer-events-none absolute inset-x-0 h-px" style={{ top: `${((ZOOM_END + EXIT_START) / 2) * 100}dvh` }} />
+    <section ref={section} id="top" aria-label={t.landing.region} className="relative h-[300svh] text-zinc-50">
+      <div aria-hidden className="intro-snap pointer-events-none absolute inset-x-0 h-px" style={{ top: `${((ZOOM_END + EXIT_START) / 2) * 100}svh` }} />
       <div ref={stage} className="sticky top-0 h-[100dvh] overflow-hidden">
         <div
           ref={shadow}

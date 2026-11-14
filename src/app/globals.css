@@ -14,6 +14,11 @@ html:lang(ru) .font-display {
   font-family: var(--font-oswald), var(--font-barlow), 'Arial Narrow', sans-serif;
 }
 
+/*
+ * Les longueurs de scroll (sections épinglées) sont en svh : sur mobile, la barre d'adresse
+ * qui apparaît en remontant change la hauteur en dvh et faisait sauter la page.
+ * Les scènes collantes elles-mêmes restent en dvh (elles ne changent pas la hauteur du document).
+ */
 html {
   scroll-snap-type: y proximity;
   background: var(--color-zinc-950);
@@ -131,7 +136,7 @@ body {
 @keyframes pg-exit {
   to { opacity: 0; transform: scale(0.9) translateY(-4vh); }
 }
-:is(.sd-native, .sd-js) .pg-section { height: 340dvh; padding-block: 0; view-timeline-name: --pg; view-timeline-axis: block; }
+:is(.sd-native, .sd-js) .pg-section { height: 340svh; padding-block: 0; view-timeline-name: --pg; view-timeline-axis: block; }
 :is(.sd-native, .sd-js) .pg-stage { position: sticky; top: 0; height: 100dvh; overflow: hidden; }
 :is(.sd-native, .sd-js) .pg-grid { align-items: start; }
 .sd-native .pg-col-up, .sd-native .pg-col-down, .sd-native .pg-title {
@@ -174,12 +179,12 @@ body {
 :is(.sd-native, .sd-js) .vd-static { display: none; }
 :is(.sd-native, .sd-js) .vd-section {
   display: block;
-  height: calc((var(--n) + 1) * 100dvh);
+  height: calc((var(--n) + 1) * 100svh);
   view-timeline-name: --vdt;
   view-timeline-axis: block;
 }
 /* Sentinels: one viewport per film, after the opening viewport */
-:is(.sd-native, .sd-js) .vd-sentinel { top: calc((var(--i) + 1) * 100dvh); height: 100dvh; }
+:is(.sd-native, .sd-js) .vd-sentinel { top: calc((var(--i) + 1) * 100svh); height: 100svh; }
 :is(.sd-native, .sd-js) .vd-stage {
   position: sticky;
   top: 0;
@@ -296,6 +301,10 @@ body {
 
 /* The intro's composed frame is a soft snap point (see Landing) */
 .intro-snap { scroll-snap-align: start; }
+/* Sur écran tactile, l'aimant du scroll provoque des à-coups avec l'inertie : désactivé */
+@media (pointer: coarse) {
+  html { scroll-snap-type: none; }
+}
 
 /* Entrance */
 @keyframes fade-up {
