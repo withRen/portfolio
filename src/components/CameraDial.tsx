@@ -73,7 +73,7 @@ export default function CameraDial({ active, onSelect }: Props) {
   const [readout, setReadout] = useState(0);
   const [fit, setFit] = useState(1);
   const ring = useRef<SVGGElement>(null);
-  const labels = useRef<(HTMLSpanElement | null)[]>([]);
+  const labels = useRef<(HTMLButtonElement | null)[]>([]);
   const iosSwitch = useRef<HTMLLabelElement>(null);
   const drag = useRef<{ x: number; pos: number; moved: boolean; last: number; t: number[] } | null>(null);
   const posRef = useRef(0);
@@ -201,10 +201,12 @@ export default function CameraDial({ active, onSelect }: Props) {
       <input type="checkbox" id="dial-haptic" aria-hidden tabIndex={-1} className="sr-only" {...{ switch: '' }} />
       <label ref={iosSwitch} htmlFor="dial-haptic" aria-hidden className="sr-only" />
 
-      {/* The wheel: a half disc that opens above the pill */}
+      {/* The wheel: a half disc that opens above the pill. Its names are clickable too. */}
       <div
         aria-hidden
-        className="pointer-events-none relative origin-bottom transition-[opacity,transform] duration-500 ease-out-expo"
+        onPointerEnter={(e) => e.pointerType === 'mouse' && open && show()}
+        onPointerLeave={(e) => e.pointerType === 'mouse' && !drag.current && hide()}
+        className={`relative origin-bottom transition-[opacity,transform] duration-500 ease-out-expo ${open ? 'pointer-events-auto' : 'pointer-events-none'}`}
         style={{
           width: W,
           height: R,
@@ -238,19 +240,27 @@ export default function CameraDial({ active, onSelect }: Props) {
         {/* Fixed marker at the top, like the camera's yellow notch */}
         <span className="absolute left-1/2 top-0.5 size-0 -translate-x-1/2 border-x-[6px] border-t-[8px] border-x-transparent border-t-accent" />
         {items.map((it, i) => (
-          <span
+          <button
             key={it.id}
+            type="button"
+            tabIndex={-1}
             ref={(el) => {
               labels.current[i] = el;
             }}
-            className={`label absolute left-0 top-0 whitespace-nowrap ${i === readout ? 'text-accent' : 'text-zinc-200'}`}
+            onClick={() => {
+              onSelect(it.id);
+              hide(500);
+            }}
+            className={`label absolute left-0 top-0 whitespace-nowrap rounded-full px-3 py-2 transition-colors hover:text-accent ${
+              i === readout ? 'text-accent' : 'text-zinc-200'
+            }`}
           >
             {t.dial[it.id]}
-          </span>
+          </button>
         ))}
       </div>
 
-      {/* The pill: one stop per section; the current one shows its name */}
+      {/* The pill: every section by name, the current one highlighted */}
       <div
         className="pointer-events-auto relative flex touch-none select-none items-center gap-1 rounded-full bg-zinc-950/60 p-1 shadow-[inset_0_1px_0_rgb(255_255_255/0.12),0_12px_40px_-12px_rgb(0_0_0/0.8)] ring-1 ring-white/10 backdrop-blur-xl"
         onPointerEnter={(e) => e.pointerType === 'mouse' && show()}
@@ -274,14 +284,11 @@ export default function CameraDial({ active, onSelect }: Props) {
                 onSelect(it.id);
               }}
               aria-current={isActive ? 'true' : undefined}
-              aria-label={t.dial[it.id]}
-              className={`flex h-9 items-center justify-center rounded-full font-medium transition-[width,background-color,color] duration-500 ease-out-expo ${
-                isActive
-                  ? 'w-[4.75rem] bg-white/10 text-[13px] text-accent'
-                  : 'w-9 text-[11px] text-zinc-400 hover:bg-white/5 hover:text-zinc-100'
+              className={`flex h-9 items-center justify-center whitespace-nowrap rounded-full px-3 text-[12px] font-medium transition-[background-color,color] duration-500 ease-out-expo md:px-3.5 md:text-[13px] ${
+                isActive ? 'bg-white/10 text-accent' : 'text-zinc-400 hover:bg-white/5 hover:text-zinc-100'
               }`}
             >
-              {isActive ? t.dial[it.id] : <span className="size-1.5 rounded-full bg-current" />}
+              {t.dial[it.id]}
             </button>
           );
         })}

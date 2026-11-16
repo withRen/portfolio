@@ -52,6 +52,8 @@ export default function ProjectStrip() {
 const STEP = 0.75;
 /** Durée de la transition en rideau (doit couvrir les animations pv-* de globals.css) */
 const LEAVE_MS = 1000;
+/** Intervalle minimal entre deux projets : un scroll rapide les fait défiler un par un */
+const STEP_MS = 420;
 
 type Shown = { i: number; dir: 1 | -1; from: number | null };
 
@@ -77,22 +79,34 @@ function DesktopStage() {
   const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const active = shown.i;
 
-  // Le projet affiché suit la progression dans la section
+  // Le projet affiché suit la progression dans la section, un projet à la fois : si le scroll
+  // va plus vite que l'animation, l'affichage rattrape étape par étape sans rien sauter.
   useEffect(() => {
     let raf: number | null = null;
+    let target = 0;
+    let current = 0;
+    let stepTimer: ReturnType<typeof setTimeout> | null = null;
+    const advance = () => {
+      if (stepTimer || current === target) return;
+      const dir: 1 | -1 = target > current ? 1 : -1;
+      const from = current;
+      current += dir;
+      if (leaveTimer.current) clearTimeout(leaveTimer.current);
+      leaveTimer.current = setTimeout(() => setShown((x) => ({ ...x, from: null })), LEAVE_MS);
+      setShown({ i: current, dir, from });
+      stepTimer = setTimeout(() => {
+        stepTimer = null;
+        advance();
+      }, STEP_MS);
+    };
     const pick = () => {
       raf = null;
       const el = stage.current?.parentElement;
       if (!el) return;
       const step = window.innerHeight * STEP;
       const scrolled = -el.getBoundingClientRect().top;
-      const i = Math.min(n - 1, Math.max(0, Math.floor((scrolled + step * 0.5) / step)));
-      setShown((s) => {
-        if (s.i === i) return s;
-        if (leaveTimer.current) clearTimeout(leaveTimer.current);
-        leaveTimer.current = setTimeout(() => setShown((x) => ({ ...x, from: null })), LEAVE_MS);
-        return { i, dir: i > s.i ? 1 : -1, from: s.i };
-      });
+      target = Math.min(n - 1, Math.max(0, Math.floor((scrolled + step * 0.5) / step)));
+      advance();
     };
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(pick);
@@ -104,6 +118,7 @@ function DesktopStage() {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
       if (raf) cancelAnimationFrame(raf);
+      if (stepTimer) clearTimeout(stepTimer);
       if (leaveTimer.current) clearTimeout(leaveTimer.current);
     };
   }, [n]);

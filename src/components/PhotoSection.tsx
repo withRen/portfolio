@@ -66,7 +66,7 @@ export default function PhotoSection({ onActiveImage }: Props) {
 
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_55%_40%_at_center,rgb(9_9_11/0.6),transparent_75%)]"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_45%_at_center,rgb(9_9_11/0.6)_0%,rgb(9_9_11/0.5)_22%,rgb(9_9_11/0.32)_42%,rgb(9_9_11/0.15)_60%,rgb(9_9_11/0.05)_75%,transparent_88%)]"
         />
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-5 text-center text-zinc-50 mix-blend-difference">
           <h2

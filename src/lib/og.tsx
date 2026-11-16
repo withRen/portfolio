@@ -21,8 +21,8 @@ const size = { width: 1200, height: 630 };
 const LOGO = markIcon({ fg: '#09090b', bg: '#f4f4f5' });
 
 export async function renderOg(locale: Locale) {
-  const dunes = await readFile(join(process.cwd(), 'public/photos/dunes.png'));
-  const bg = `data:image/png;base64,${dunes.toString('base64')}`;
+  const dunes = await readFile(join(process.cwd(), 'public/photos/dunes.jpg'));
+  const bg = `data:image/jpeg;base64,${dunes.toString('base64')}`;
   return new ImageResponse(
     (
       <div style={{ width: '100%', height: '100%', display: 'flex', position: 'relative', background: '#09090b' }}>

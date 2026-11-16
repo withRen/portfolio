@@ -15,7 +15,7 @@ import CameraDial, { type DialId } from './CameraDial';
 import VideoSection from './VideoSection';
 
 const SECTIONS: DialId[] = ['top', 'photos', 'videos', 'dev', 'contact'];
-const dunes = asset('/photos/dunes.png');
+const dunes = asset('/photos/dunes.jpg');
 
 export default function Site({ locale }: { locale: Locale }) {
   const [section, setSection] = useState<DialId>('top');
@@ -41,7 +41,7 @@ export default function Site({ locale }: { locale: Locale }) {
   // The fixed backdrop follows the active photo inside the photo section
   const target = section === 'photos' ? photo : dunes;
   useEffect(() => {
-    const t = setTimeout(() => setBackdrop(target), 140);
+    const t = setTimeout(() => setBackdrop(target), 180);
     return () => clearTimeout(t);
   }, [target]);
 

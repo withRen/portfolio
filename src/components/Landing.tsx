@@ -122,12 +122,12 @@ export default function Landing({ onNav }: Props) {
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={asset('/photos/dunes.png')}
+                src={asset('/photos/dunes.jpg')}
                 alt={t.landing.heroAlt}
                 draggable={false}
                 className="absolute inset-0 size-full object-cover"
               />
-              <WaveCanvas src={asset('/photos/dunes.png')} />
+              <WaveCanvas src={asset('/photos/dunes.jpg')} />
             </div>
           </button>
         </div>
