@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useRef, useState, type CSSProperties, type Ref } from 'react';
-import { ArrowUpRight, CaretLeft, CaretRight, HandSwipeLeft } from '@phosphor-icons/react';
+import { ArrowUpRight, HandSwipeLeft } from '@phosphor-icons/react';
 import type { Featured } from '@/data/content';
 import { useI18n } from '@/i18n/context';
+import MediaNav from './MediaNav';
 
 /*
  * Projets dev, présentés directement en grand, sans clic pour ouvrir.
@@ -134,8 +135,6 @@ function DesktopStage() {
   };
 
   const p = featured[active];
-  const prev = featured[(active - 1 + n) % n];
-  const next = featured[(active + 1) % n];
   const leaving = shown.from !== null && shown.from !== active ? featured[shown.from] : null;
   const dirStyle = { '--d': shown.dir } as CSSProperties;
   const line = (k: number) => ({ '--d': shown.dir, '--k': k }) as CSSProperties;
@@ -148,52 +147,8 @@ function DesktopStage() {
       aria-roledescription={t.dev.carousel}
       aria-label={t.dev.region}
     >
-      {/* Règle : un trait par projet, cliquable */}
-      <nav aria-label={t.dev.choose} className="flex justify-center pt-8">
-        <ul className="flex items-end gap-1">
-          {featured.map((f, i) => (
-            <li key={f.id}>
-              <button
-                type="button"
-                onClick={() => go(i)}
-                aria-label={f.title}
-                aria-current={i === active ? 'true' : undefined}
-                className="group flex h-8 items-end px-2"
-              >
-                <span
-                  className={`block w-px transition-[height,background-color] duration-500 ${
-                    i === active ? 'h-6 bg-zinc-50' : 'h-3 bg-zinc-600 group-hover:bg-zinc-300'
-                  }`}
-                />
-              </button>
-            </li>
-          ))}
-        </ul>
-      </nav>
-
-      {/* Image du projet, avec ses voisins qui attendent sur les côtés */}
-      <div className="relative flex min-h-0 flex-1 px-[9vw] py-5">
-        <button
-          type="button"
-          onClick={() => go(active - 1)}
-          aria-label={t.dev.prevNamed(prev.title)}
-          className="group absolute left-0 top-1/2 z-20 h-[56%] w-[5vw] -translate-y-1/2 overflow-hidden rounded-r-xl"
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img key={prev.id} src={prev.cover} alt="" loading="lazy" style={dirStyle} className="pv-peek size-full object-cover brightness-[0.4] grayscale transition-[filter] duration-500 group-hover:brightness-75" />
-          <CaretLeft size={20} aria-hidden className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-zinc-50" />
-        </button>
-        <button
-          type="button"
-          onClick={() => go(active + 1)}
-          aria-label={t.dev.nextNamed(next.title)}
-          className="group absolute right-0 top-1/2 z-20 h-[56%] w-[5vw] -translate-y-1/2 overflow-hidden rounded-l-xl"
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img key={next.id} src={next.cover} alt="" loading="lazy" style={dirStyle} className="pv-peek size-full object-cover brightness-[0.4] grayscale transition-[filter] duration-500 group-hover:brightness-75" />
-          <CaretRight size={20} aria-hidden className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-zinc-50" />
-        </button>
-
+      {/* Image du projet */}
+      <div className="relative flex min-h-0 flex-1 px-[9vw] pb-5 pt-10">
         {/* Les deux images partagent la même case : l'ancienne recule, la nouvelle se dévoile */}
         <div className="grid min-h-0 w-full grid-cols-[minmax(0,1fr)] grid-rows-[minmax(0,1fr)]">
           {leaving && <Cover key={`out-${leaving.id}`} p={leaving} decorative style={dirStyle} className="pv-leave pointer-events-none" />}
@@ -202,13 +157,10 @@ function DesktopStage() {
       </div>
 
       {/* Informations complètes, lisibles sans clic */}
-      <div key={`d-${p.id}`} aria-live="polite" className="mx-auto grid w-full max-w-[1400px] grid-cols-12 items-end gap-8 px-10 pb-24">
+      <div key={`d-${p.id}`} aria-live="polite" className="mx-auto grid w-full max-w-[1400px] grid-cols-12 items-end gap-8 px-10 pb-40">
         <div className="col-span-5">
           <p className="pv-line label text-zinc-500" style={line(0)}>
             {p.context}
-            <span className="ml-3 text-zinc-600">
-              {String(active + 1).padStart(2, '0')} / {String(n).padStart(2, '0')}
-            </span>
           </p>
           <h3 className="pv-line mt-2 text-4xl font-semibold leading-tight tracking-tight text-zinc-50" style={line(1)}>
             {p.title}
@@ -225,6 +177,17 @@ function DesktopStage() {
           <Links p={p} className="justify-end" />
         </div>
       </div>
+
+      {/* Même barre de navigation que la section vidéo, au même endroit */}
+      <MediaNav
+        label={t.dev.choose}
+        items={featured.map((f) => ({ id: f.id, title: f.title, thumb: f.cover }))}
+        active={active}
+        onPrev={() => go(active - 1)}
+        onNext={() => go(active + 1)}
+        onSelect={go}
+        className="absolute bottom-24 left-10 z-20"
+      />
     </div>
   );
 }
@@ -446,7 +409,7 @@ function MobileDeck() {
   const prevIndex = (active - 1 + n) % n;
 
   return (
-    <div className="flex h-[100svh] flex-col px-3 pb-[5.5rem] pt-3 [overflow-anchor:none]" role="region" aria-roledescription={t.dev.carousel} aria-label={t.dev.region}>
+    <div className="flex h-[100svh] flex-col px-3 pb-24 pt-3 [overflow-anchor:none]" role="region" aria-roledescription={t.dev.carousel} aria-label={t.dev.region}>
       <div
         ref={deck}
         className="relative min-h-0 flex-1 touch-pan-y"
@@ -476,31 +439,20 @@ function MobileDeck() {
         />
       </div>
 
-      {/* Boutons (accessibilité et clavier), même animation que le swipe */}
-      <div className="flex items-center justify-between px-2 pt-3">
-        <span aria-live="polite" className="sr-only">
-          {p.title}
-        </span>
-        <button
-          type="button"
-          onClick={() => fly(-1)}
-          aria-label={t.dev.prev}
-          className="inline-flex size-11 items-center justify-center rounded-full border border-white/15 text-zinc-100 active:scale-95"
-        >
-          <CaretLeft size={18} aria-hidden />
-        </button>
-        <span className="label text-zinc-500">
-          {String(active + 1).padStart(2, '0')} / {String(n).padStart(2, '0')}
-        </span>
-        <button
-          type="button"
-          onClick={() => fly(1)}
-          aria-label={t.dev.next}
-          className="inline-flex size-11 items-center justify-center rounded-full border border-white/15 text-zinc-100 active:scale-95"
-        >
-          <CaretRight size={18} aria-hidden />
-        </button>
-      </div>
+      {/* Même barre de navigation que la section vidéo ; les flèches lancent la carte comme un swipe */}
+      <span aria-live="polite" className="sr-only">
+        {p.title}
+      </span>
+      <MediaNav
+        label={t.dev.choose}
+        items={featured.map((f) => ({ id: f.id, title: f.title, thumb: f.cover }))}
+        active={active}
+        onPrev={() => fly(-1)}
+        onNext={() => fly(1)}
+        onSelect={(i) => setActive(i)}
+        thumbs={false}
+        className="pt-3"
+      />
     </div>
   );
 }

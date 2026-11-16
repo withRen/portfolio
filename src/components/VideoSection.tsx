@@ -5,6 +5,7 @@ import { ArrowUpRight, Play, SpeakerHigh, SpeakerSlash } from '@phosphor-icons/r
 import { ytThumb, type Video } from '@/data/content';
 import { useI18n } from '@/i18n/context';
 import { allowsYouTube, setYouTubeConsent, useYouTubeConsent } from '@/lib/consent';
+import MediaNav from './MediaNav';
 import VideoPlayer from './VideoPlayer';
 
 /*
@@ -178,7 +179,7 @@ export default function VideoSection() {
             <ol className="absolute inset-0">
               {videos.map((v, i) => (
                 <li key={v.id} className="vd-caption absolute inset-x-0 bottom-0" style={{ '--i': i } as CSSProperties}>
-                  <div className="flex flex-col gap-6 p-6 pb-24 md:flex-row md:items-end md:justify-between md:p-12 md:pb-32">
+                  <div className="flex flex-col gap-6 p-6 pb-40 md:flex-row md:items-end md:justify-between md:p-10 md:pb-44">
                     <div>
                       <p className="label text-zinc-300">{v.type}</p>
                       <h3 className="mt-3 font-display text-5xl font-bold uppercase leading-[0.88] tracking-tight text-zinc-50 md:text-8xl">
@@ -227,26 +228,15 @@ export default function VideoSection() {
             )}
 
             {/* Film strip: jump to any film */}
-            <ul
-              aria-label={t.video.films}
-              className="vd-strip absolute bottom-8 left-12 hidden gap-2 md:flex"
-            >
-              {videos.map((v, i) => (
-                <li key={v.id}>
-                  <button
-                    type="button"
-                    onClick={() => jump(i)}
-                    aria-label={t.video.goTo(v.title)}
-                    aria-current={i === active ? 'true' : undefined}
-                    className={`relative block aspect-video w-14 overflow-hidden rounded-lg ring-1 transition-[opacity,box-shadow] duration-500 ease-out-expo hover:opacity-100 md:w-20 ${
-                      i === active ? 'opacity-100 ring-2 ring-zinc-50' : 'opacity-50 ring-white/20'
-                    }`}
-                  >
-                    <Thumb v={v} />
-                  </button>
-                </li>
-              ))}
-            </ul>
+            <MediaNav
+              label={t.video.films}
+              items={videos.map((v) => ({ id: v.id, title: v.title, thumb: ytThumb(v.id) }))}
+              active={active}
+              onPrev={() => jump((Math.max(0, active) - 1 + n) % n)}
+              onNext={() => jump((Math.max(0, active) + 1) % n)}
+              onSelect={jump}
+              className="vd-strip absolute bottom-24 left-6 md:left-10"
+            />
           </div>
         </div>
       </div>

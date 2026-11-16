@@ -15,6 +15,7 @@ const fr = {
     videosList: 'Vidéos',
   },
   lang: { label: 'Langue' },
+  nav: { prev: 'Précédent', next: 'Suivant', goTo: (t: string) => `Aller à ${t}` },
   loader: 'Chargement du site',
   landing: {
     region: 'Introduction',
@@ -103,6 +104,7 @@ const en: Dict = {
     videosList: 'Videos',
   },
   lang: { label: 'Language' },
+  nav: { prev: 'Previous', next: 'Next', goTo: (t: string) => `Go to ${t}` },
   loader: 'Loading the site',
   landing: {
     region: 'Introduction',
@@ -189,6 +191,7 @@ const ru: Dict = {
     videosList: 'Видео',
   },
   lang: { label: 'Язык' },
+  nav: { prev: 'Назад', next: 'Вперёд', goTo: (t: string) => `Перейти к «${t}»` },
   loader: 'Загрузка сайта',
   landing: {
     region: 'Вступление',
