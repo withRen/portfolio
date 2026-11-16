@@ -9,7 +9,7 @@ export type Video = {
   title: string;
   type: string;
   href: string;
-  /** Date de mise en ligne sur YouTube (ISO 8601), pour les données structurées */
+  /** Date et heure de mise en ligne sur YouTube (ISO 8601 avec fuseau horaire, exigé par Google) */
   uploaded: string;
   /** Durée au format ISO 8601 */
   duration: string;
@@ -242,28 +242,28 @@ const videoSrc: { id: string; title: T; type: T; uploaded: string; duration: str
     id: 'zNx36iwjhD8',
     title: { fr: 'Pub de montre', en: 'Watch commercial', ru: 'Реклама часов' },
     type: { fr: 'Publicité produit', en: 'Product ad', ru: 'Реклама продукта' },
-    uploaded: '2025-11-23',
+    uploaded: '2025-11-23T10:00:02-08:00',
     duration: 'PT1M19S',
   },
   {
     id: 'OSng25-tAkc',
     title: { fr: 'Europe en 2100', en: 'Europe in 2100', ru: 'Европа в 2100 году' },
     type: { fr: 'Documentaire fictif', en: 'Mockumentary', ru: 'Псевдодокументальный фильм' },
-    uploaded: '2025-05-23',
+    uploaded: '2025-05-23T11:30:06-07:00',
     duration: 'PT1M56S',
   },
   {
     id: 'LTE60C6riRU',
     title: { fr: 'Amentia', en: 'Amentia', ru: 'Amentia' },
     type: { fr: 'Projet créatif', en: 'Creative project', ru: 'Творческий проект' },
-    uploaded: '2025-06-07',
+    uploaded: '2025-06-07T05:17:54-07:00',
     duration: 'PT49S',
   },
   {
     id: 'IzuP73MLAhQ',
     title: { fr: 'Intro Kill Bill', en: 'Kill Bill intro', ru: 'Заставка «Убить Билла»' },
     type: { fr: 'Générique alternatif', en: 'Alternative opening titles', ru: 'Альтернативная заставка' },
-    uploaded: '2026-02-26',
+    uploaded: '2026-02-26T04:43:46-08:00',
     duration: 'PT21S',
   },
 ];
