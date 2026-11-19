@@ -71,8 +71,8 @@ const fr = {
     swipeHint: 'Glisse pour changer de projet',
   },
   contact: {
-    title: 'Un projet, une idée ?',
-    cta: 'Me contacter',
+    title: 'Restons en contact',
+    cta: 'Me retrouver sur LinkedIn',
     bio: 'Étudiant en BUT MMI. Je développe des applications web, mobiles et desktop, et je réalise des vidéos et des photos.',
     legal: 'Mentions légales',
   },
@@ -160,8 +160,8 @@ const en: Dict = {
     swipeHint: 'Swipe to change project',
   },
   contact: {
-    title: 'A project, an idea?',
-    cta: 'Get in touch',
+    title: 'Let’s keep in touch',
+    cta: 'Find me on LinkedIn',
     bio: 'Multimedia student (BUT MMI) in France. I build web, mobile and desktop applications, and I make videos and photos.',
     legal: 'Legal notice',
   },
@@ -247,8 +247,8 @@ const ru: Dict = {
     swipeHint: 'Смахните, чтобы сменить проект',
   },
   contact: {
-    title: 'Есть проект или идея?',
-    cta: 'Связаться',
+    title: 'Будем на связи',
+    cta: 'Я в LinkedIn',
     bio: 'Студент программы BUT MMI во Франции. Разрабатываю веб-, мобильные и десктопные приложения, снимаю видео и фотографирую.',
     legal: 'Правовая информация',
   },
